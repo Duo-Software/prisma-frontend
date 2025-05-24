@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
 import GlobalStyles from './styles/GlobalStyles.ts';
 import {darkTheme} from './styles/theme';
+import Instituicoes from "./pages/Instituicoes";
 
 
 function App() {
@@ -14,6 +15,8 @@ function App() {
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/profile" element={<div>Página de Perfil</div>} />
                         <Route path="/settings" element={<div>Página de Configurações</div>} />
+                        <Route path="/instituicoes" element={<Instituicoes />} />
+
                     </Routes>
                 </Layout>
             </Router>
