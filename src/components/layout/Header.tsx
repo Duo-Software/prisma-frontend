@@ -14,7 +14,7 @@ const Header: React.FC = () => {
                   {themeMode === 'dark' ? (
                       <FiSun color="#FFD600" size={36} />
                   ) : (
-                      <FiMoon color="#2196F3" size={36} />
+                      <FiMoon color="#FFD600" size={36} />
                   )}
               </ToggleDisplay>
           </ThemeToggleButton>
@@ -29,16 +29,22 @@ const Header: React.FC = () => {
 };
 
 const HeaderContainer = styled.header`
-  height: ${props => props.theme.sizes.headerHeight};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  background-color: ${props => props.theme.colors.headerBackground};
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-  transition: background-color ${props => props.theme.transition};
-`;
-
+    width: 100vw;
+    min-width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: ${props => props.theme.sizes.headerHeight};
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background-color: ${props => props.theme.colors.headerBackground};
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color ${props => props.theme.transition};
+`
 
 const ActionsContainer = styled.div`
     display: flex;

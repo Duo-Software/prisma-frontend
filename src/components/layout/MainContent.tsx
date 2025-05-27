@@ -22,7 +22,7 @@ interface MainContentContainerProps {
 
 const MainContentContainer = styled.main<MainContentContainerProps>`
     margin-left: ${props => props.$isSidebarOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed};
-    padding: 1.5rem;
+    padding: ${props => props.theme.sizes.headerHeight} 1.5rem 1.5rem;
     min-height: calc(100vh - ${props => props.theme.sizes.headerHeight});
     transition: margin-left ${props => props.theme.transition};
     background-color: ${props => props.theme.colors.background};

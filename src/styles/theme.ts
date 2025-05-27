@@ -16,12 +16,13 @@ export const lightTheme: Theme = {
     border: '#e2e8f0',
     sidebarBackground: '#1e1e2c',
     sidebarText: '#f8f9fa',
-    headerBackground: '#ffffff',
+    headerBackground: '#4895ef',
   },
   sizes: {
     sidebarWidth: '250px',
     sidebarWidthCollapsed: '70px',
-    headerHeight: '60px',
+    headerHeight: '64px',
+    fixedHeaderHeight: '96px'
   },
   borderRadius: '8px',
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
@@ -49,7 +50,8 @@ export const darkTheme: Theme = {
   sizes: {
     sidebarWidth: '250px',
     sidebarWidthCollapsed: '70px',
-    headerHeight: '60px',
+    headerHeight: '64px',
+    fixedHeaderHeight: '96px'
   },
   borderRadius: '8px',
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',

@@ -38,9 +38,10 @@ const LayoutContainer = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-    flex: 1;
     display: flex;
-    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    background: ${props => props.theme.colors.background};
 `;
 
 export default Layout;

@@ -1,6 +1,13 @@
 import styled from "styled-components";
 import React from "react";
 
+interface FixedHeaderProps {
+    $sidebarWidth: string;
+    $sidebarCollapsedWidth: string;
+    $isSidebarOpen: boolean;
+}
+
+
 export const DefaultComponents: React.FC = () => {
     return (
         <DefaultContainer>
@@ -11,10 +18,12 @@ export const DefaultComponents: React.FC = () => {
 
 export const DefaultContainer = styled.div`
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    margin-top: calc(${props => props.theme.sizes.headerHeight} + ${props => props.theme.sizes.fixedHeaderHeight});
     gap: 1.5rem;
     padding: 1rem 0;
 `;
+
 
 export const CardTitle = styled.h2`
   font-size: 1.15rem;
@@ -126,3 +135,20 @@ export const ContentCard = styled.div<ContentCardProps>`
   flex-direction: column;
   gap: 1rem;
 `;
+
+export const FixedHeader = styled.div<FixedHeaderProps>`
+    position: fixed;
+    z-index: 110; // deve ser maior que o header, menor que o sidebar
+    background: ${props => props.theme.colors.background};
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 2px 10px 0 rgba(0,0,0,0.05);
+    left: ${props => props.$isSidebarOpen ? props.$sidebarWidth : props.$sidebarCollapsedWidth};
+    width: calc(100vw - ${props => props.$isSidebarOpen ? props.$sidebarWidth : props.$sidebarCollapsedWidth});
+    top: ${props => props.theme.sizes.headerHeight};
+    transition: left ${props => props.theme.transition}, width ${props => props.theme.transition};
+`;
+

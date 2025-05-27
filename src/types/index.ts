@@ -22,6 +22,8 @@ export interface Theme {
         sidebarWidth: string;
         sidebarWidthCollapsed: string;
         headerHeight: string;
+        fixedHeaderHeight: string,
+
     };
     borderRadius: string;
     boxShadow: string;

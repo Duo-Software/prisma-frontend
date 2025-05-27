@@ -6,7 +6,7 @@ import { useSidebar } from '../../context/SidebarContext';
 import type {Theme} from '../../types';
 
 declare module "styled-components" {
-  export interface DefaultTheme extends Theme {}
+    export interface DefaultTheme extends Theme {}
 }
 
 const Sidebar: React.FC = () => {
@@ -23,8 +23,8 @@ const Sidebar: React.FC = () => {
 
     return (
         <SidebarContainer $isOpen={isSidebarOpen}>
-            <SidebarHeader>
-                <Logo>
+            <SidebarHeader $isOpen={isSidebarOpen}>
+                <Logo hidden={!isSidebarOpen}>
                     {isSidebarOpen ? 'Prisma' : 'P'}
                 </Logo>
                 <ToggleButton onClick={toggleSidebar}>
@@ -61,53 +61,53 @@ interface SidebarContainerProps {
 }
 
 const SidebarContainer = styled.aside<SidebarContainerProps>`
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  width: ${props => props.$isOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed};
-  background-color: ${props => props.theme.colors.sidebarBackground};
-  color: ${props => props.theme.colors.sidebarText};
-  transition: width ${props => props.theme.transition};
-  z-index: 1000;
-  box-shadow: ${props => props.theme.boxShadow};
-  display: flex;
-  flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: ${props => props.$isOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed};
+    background-color: ${props => props.theme.colors.sidebarBackground};
+    color: ${props => props.theme.colors.sidebarText};
+    transition: width ${props => props.theme.transition};
+    z-index: 1000;
+    box-shadow: ${props => props.theme.boxShadow};
+    display: flex;
+    flex-direction: column;
 `;
 
-const SidebarHeader = styled.div`
-  height: ${props => props.theme.sizes.headerHeight};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+const SidebarHeader = styled.div<SidebarContainerProps>`
+    height: ${props => props.theme.sizes.headerHeight};
+    display: flex;
+    align-items: center;
+    justify-content: ${props => props.$isOpen ? 'space-between' : 'center'};
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const Logo = styled.div`
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: ${props => props.theme.colors.primaryLight};
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: ${props => props.theme.colors.primaryLight};
 `;
 
 const ToggleButton = styled.button`
-  background: transparent;
-  border: none;
-  color: ${props => props.theme.colors.sidebarText};
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background: transparent;
+    border: none;
+    color: ${props => props.theme.colors.sidebarText};
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const NavMenu = styled.ul`
-  list-style: none;
-  padding: 1rem 0;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+    list-style: none;
+    padding: 1rem 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 `;
 
 interface NavItemProps {
@@ -117,70 +117,70 @@ interface NavItemProps {
 }
 
 const NavItem = styled.li<NavItemProps>`
-  margin: 0.25rem 0.5rem;
-  border-radius: ${props => props.theme.borderRadius};
-  background-color: ${props => props.$isActive ? props.theme.colors.primary : 'transparent'};
-  transition: background-color 0.2s ease;
-  position: relative;
-  
-  &:hover {
-    background-color: ${props => props.$isActive ? props.theme.colors.primary : 'rgba(255, 255, 255, 0.1)'};
-  }
+    margin: 0.25rem 0.5rem;
+    border-radius: ${props => props.theme.borderRadius};
+    background-color: ${props => props.$isActive ? props.theme.colors.primary : 'transparent'};
+    transition: background-color 0.2s ease;
+    position: relative;
+
+    &:hover {
+        background-color: ${props => props.$isActive ? props.theme.colors.primary : 'rgba(255, 255, 255, 0.1)'};
+    }
 `;
 
 const NavLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  color: ${props => props.theme.colors.sidebarText};
-  position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: ${props => props.theme.colors.sidebarText};
+    position: relative;
 `;
 
 const NavIcon = styled.span`
-  font-size: 1.2rem;
-  min-width: 1.5rem;
-  display: flex;
-  align-items: center;
+    font-size: 1.2rem;
+    min-width: 1.5rem;
+    display: flex;
+    align-items: center;
 `;
 
 const NavLabel = styled.span`
-  margin-left: 0.75rem;
-  white-space: nowrap;
+    margin-left: 0.75rem;
+    white-space: nowrap;
 `;
 
 const Tooltip = styled.div`
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  padding: 0.5rem 0.75rem;
-  border-radius: ${props => props.theme.borderRadius};
-  white-space: nowrap;
-  box-shadow: ${props => props.theme.boxShadow};
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
-  pointer-events: none;
-  z-index: 1001;
-  margin-left: 10px;
-  
-  &::before {
-    content: '';
     position: absolute;
-    left: -6px;
+    left: 100%;
     top: 50%;
     transform: translateY(-50%);
-    border-width: 6px 6px 6px 0;
-    border-style: solid;
-    border-color: transparent ${props => props.theme.colors.surface} transparent transparent;
-  }
-  
-  ${NavLink}:hover & {
-    opacity: 1;
-    visibility: visible;
-  }
+    background-color: ${props => props.theme.colors.surface};
+    color: ${props => props.theme.colors.text};
+    padding: 0.5rem 0.75rem;
+    border-radius: ${props => props.theme.borderRadius};
+    white-space: nowrap;
+    box-shadow: ${props => props.theme.boxShadow};
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+    z-index: 1001;
+    margin-left: 10px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 6px 6px 6px 0;
+        border-style: solid;
+        border-color: transparent ${props => props.theme.colors.surface} transparent transparent;
+    }
+
+    ${NavLink}:hover & {
+        opacity: 1;
+        visibility: visible;
+    }
 `;
 
 export default Sidebar;
