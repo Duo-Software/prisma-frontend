@@ -152,3 +152,74 @@ export const FixedHeader = styled.div<FixedHeaderProps>`
     transition: left ${props => props.theme.transition}, width ${props => props.theme.transition};
 `;
 
+export const ButtonStyled = styled.button`
+  background-color: ${props => props.theme.colors.primary};
+  color: #fff;
+  border: none;
+  border-radius: ${props => props.theme.borderRadius};
+  padding: 0.65em 1.5em;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 10px 0 rgba(67, 97, 238, 0.08);
+  cursor: pointer;
+  transition: 
+    background-color ${props => props.theme.transition},
+    box-shadow ${props => props.theme.transition},
+    transform 0.2s;
+
+  &:hover,
+  &:focus {
+    background-color: ${props => props.theme.colors.primaryLight};
+    box-shadow: 0 6px 18px rgba(67, 97, 238, 0.15);
+    outline: none;
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  &:disabled {
+    background-color: ${props => props.theme.colors.border};
+    color: ${props => props.theme.colors.textSecondary};
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+    transform: none;
+  }
+`;
+
+export const FormContainer = styled.div<FixedHeaderProps>`
+    min-height: calc(100vh - ${({ theme }) => theme.sizes.headerHeight});
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: ${({ theme }) => theme.colors.background || "#f5f6fa"};
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+`;
+
+export const CardWrapper = styled.div<FixedHeaderProps>`
+    z-index: 110;
+    position: page;
+    width: calc(
+            97.5vw - ${props =>
+                    props.$isSidebarOpen
+                            ? props.theme.sizes.sidebarWidth
+                            : props.theme.sizes.sidebarWidthCollapsed}
+    );
+
+    margin: 32px auto;
+    background-color: ${({ theme }) => theme.colors.background};
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    border-radius: ${props => props.theme.borderRadius};
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: max-width ${props => props.theme.transition};
+`;
+
+
+
+
+

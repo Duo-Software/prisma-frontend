@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     DashboardContainer,
     Card,
@@ -9,17 +10,19 @@ import {
     DefaultContainer,
     CardTitle,
     StatChange,
-    FixedHeader
-} from "../components/layout/DefaultComponents.tsx";
-import { mockInstitutions } from "../mocks/instituicoes-mock.ts";
-import {useSidebar} from "../context/SidebarContext.tsx";
+    FixedHeader, ButtonStyled
+} from "../../components/layout/DefaultComponents.tsx";
+import { mockInstitutions } from "../../mocks/instituicoes-mock.ts";
+import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
+import {FiPlus} from "react-icons/fi";
 
 const Instituicoes: React.FC = () => {
     const [search, setSearch] = useState("");
     const [institutions] = useState(mockInstitutions);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
+    const navigate = useNavigate();
 
 
     // Filtrar instituições conforme busca, só aplica filtro com mais de 3 caracteres
@@ -61,6 +64,23 @@ const Instituicoes: React.FC = () => {
                             style={{minWidth: 320, padding: 8, fontSize: 16}}
                         />
                     </CardTitle>
+
+                    <div style={{
+                        position: "absolute",
+                        bottom: 16,
+                        right: 24,
+                        zIndex: 10
+                    }}>
+                        <ButtonStyled
+                            onClick={() => navigate("/Instituicoes/cadastro-instituicao")}
+                            title="Cadastrar nova instituição"
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 12 }}
+                        >
+                            <FiPlus size={24} />
+                        </ButtonStyled>
+                    </div>
+
+
                 </FixedHeader>
 
             </DefaultContainer>
