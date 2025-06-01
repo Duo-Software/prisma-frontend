@@ -166,7 +166,6 @@ export const ButtonStyled = styled.button`
     background-color ${props => props.theme.transition},
     box-shadow ${props => props.theme.transition},
     transform 0.2s;
-
   &:hover,
   &:focus {
     background-color: ${props => props.theme.colors.primaryLight};
@@ -174,7 +173,6 @@ export const ButtonStyled = styled.button`
     outline: none;
     transform: translateY(-2px) scale(1.01);
   }
-
   &:disabled {
     background-color: ${props => props.theme.colors.border};
     color: ${props => props.theme.colors.textSecondary};
@@ -183,6 +181,44 @@ export const ButtonStyled = styled.button`
     box-shadow: none;
     transform: none;
   }
+`;
+
+export const ButtonCardStyled = styled.button`
+    background-color: ${props => props.theme.colors.primary};
+    color: #fff;
+    border: none;
+    border-radius: ${props => props.theme.borderRadius};
+    padding: 0.65em 1.5em;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 10px 0 rgba(67, 97, 238, 0.08);
+    cursor: pointer;
+    display: flex;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    transition: background-color ${props => props.theme.transition},
+    box-shadow ${props => props.theme.transition},
+    transform 0.2s;
+
+    &:hover,
+    &:focus {
+        background-color: ${props => props.theme.colors.primaryLight};
+        box-shadow: 0 6px 18px rgba(67, 97, 238, 0.15);
+        outline: none;
+        transform: translateY(-2px) scale(1.01);
+    }
+
+    &:disabled {
+        background-color: ${props => props.theme.colors.border};
+        color: ${props => props.theme.colors.textSecondary};
+        cursor: not-allowed;
+        opacity: 0.7;
+        box-shadow: none;
+        transform: none;
+    }
 `;
 
 export const FormContainer = styled.div<FixedHeaderProps>`
@@ -218,6 +254,9 @@ export const CardWrapper = styled.div<FixedHeaderProps>`
     flex-direction: column;
     transition: max-width ${props => props.theme.transition};
 `;
+
+export const alignRightStyle = { alignItems: 'center', justifyContent: 'flex-end', marginLeft: 'auto' };
+
 
 
 

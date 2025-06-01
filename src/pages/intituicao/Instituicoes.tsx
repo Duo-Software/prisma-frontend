@@ -10,12 +10,12 @@ import {
     DefaultContainer,
     CardTitle,
     StatChange,
-    FixedHeader, ButtonStyled
+    FixedHeader, ButtonStyled, ButtonCardStyled
 } from "../../components/layout/DefaultComponents.tsx";
 import { mockInstitutions } from "../../mocks/instituicoes-mock.ts";
 import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
-import {FiPlus} from "react-icons/fi";
+import {FiEdit, FiPlus} from "react-icons/fi";
 
 const Instituicoes: React.FC = () => {
     const [search, setSearch] = useState("");
@@ -101,6 +101,24 @@ const Instituicoes: React.FC = () => {
                                         </StatChange>
                                     </StatLabel>
                                 </StatContent>
+                                <ButtonCardStyled
+                                    onClick={() => navigate("/Instituicoes/cadastro-instituicao", {state: institution})}
+                                    title="Editar instituição"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "flex-end",
+                                        marginLeft: "auto",
+                                        padding: 4,
+                                        width: 24,
+                                        height: 24,
+                                        position: "absolute",
+                                        bottom: 16,
+                                        right: 16
+                                    }}
+                                >
+                                    <FiEdit size={16} />
+                                </ButtonCardStyled>
                             </Card>
                         </StatsGrid>
                     ))}
