@@ -21,7 +21,7 @@ export const Dashboard: React.FC = () => {
                 <Card>
                     <CardTitle>Total de alunos</CardTitle>
                     <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
-                        <BiSmile color="#0ea5e9" />
+                        <BiSmile color="#0ea5e9"/>
                     </StatIconWrapper>
                     <StatContent>
                         <StatValue>2340</StatValue>
@@ -32,38 +32,40 @@ export const Dashboard: React.FC = () => {
                         </StatFooter>
                     </StatContent>
                 </Card>
-                </StatsGrid>
-
-                <StatsGrid>
-                    <Link to="/Instituicoes" style={{textDecoration: "none"}}>
-                        <Card>
-                            <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
-                                <BsBuilding color="#0ea5e9"/>
-                            </StatIconWrapper>
-                            <StatContent>
-                                <StatValue>2340</StatValue>
-                                <StatLabel>Instituições de ensino</StatLabel>
-                            </StatContent>
-                        </Card>
-                    </Link>
-                </StatsGrid>
+            </StatsGrid>
 
             <StatsGrid>
-                <Card>
-                    <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
-                        <BiBriefcase color="#0ea5e9" />
-                    </StatIconWrapper>
-                    <StatContent>
-                        <StatValue>2340</StatValue>
-                        <StatLabel>Profissionais</StatLabel>
-                    </StatContent>
-                </Card>
+                <Link to="/Instituicoes" style={{textDecoration: "none"}}>
+                    <Card>
+                        <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                            <BsBuilding color="#0ea5e9"/>
+                        </StatIconWrapper>
+                        <StatContent>
+                            <StatValue>2340</StatValue>
+                            <StatLabel>Instituições de ensino</StatLabel>
+                        </StatContent>
+                    </Card>
+                </Link>
+            </StatsGrid>
+
+            <StatsGrid>
+                <Link to="/profissionais" style={{textDecoration: "none"}}>
+                    <Card>
+                        <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                            <BiBriefcase color="#0ea5e9"/>
+                        </StatIconWrapper>
+                        <StatContent>
+                            <StatValue>2340</StatValue>
+                            <StatLabel>Profissionais</StatLabel>
+                        </StatContent>
+                    </Card>
+                </Link>
             </StatsGrid>
 
             <StatsGrid>
                 <Card>
                     <StatIconWrapper $bgColor="rgba(245, 158, 11, 0.15)">
-                        <FiUsers color="#f59e0b" />
+                        <FiUsers color="#f59e0b"/>
                     </StatIconWrapper>
                     <StatContent>
                         <StatValue>854</StatValue>
@@ -80,7 +82,7 @@ export const Dashboard: React.FC = () => {
             <StatsGrid>
                 <Card>
                     <StatIconWrapper $bgColor="rgba(34, 197, 94, 0.15)">
-                        <FiFileMinus color="#22c55e" />
+                        <FiFileMinus color="#22c55e"/>
                     </StatIconWrapper>
                     <StatContent>
                         <StatValue>432</StatValue>

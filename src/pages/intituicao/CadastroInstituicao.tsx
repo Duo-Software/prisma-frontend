@@ -89,6 +89,7 @@ const CadastroInstituicao: React.FC = () => {
             totalAlunos: Number(form.totalAlunos),
             ativo: form.ativo
         };
+        console.log(instituicaoPayload);
 
         // Aqui você deve chamar a API correspondente (POST para criar, PUT para editar)
         // Por exemplo:

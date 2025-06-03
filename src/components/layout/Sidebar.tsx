@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { FiHome, FiUser, FiSettings, FiMenu, FiX, FiCalendar, FiDatabase } from 'react-icons/fi';
+import { FiHome, FiUser, FiSettings, FiMenu, FiX, FiCalendar, FiDatabase, FiUsers, FiBookOpen } from 'react-icons/fi';
 import { useSidebar } from '../../context/SidebarContext';
 import type {Theme} from '../../types';
 
@@ -15,6 +15,8 @@ const Sidebar: React.FC = () => {
 
     const menuItems = [
         { path: '/', label: 'Home', icon: <FiHome /> },
+        { path: '/instituicoes', label: 'Instituições', icon: <FiBookOpen /> },
+        { path: '/profissionais', label: 'Profissionais', icon: <FiUsers /> },
         { path: '/calendar', label: 'Calendário', icon: <FiCalendar /> },
         { path: '/data', label: 'Dados', icon: <FiDatabase /> },
         { path: '/profile', label: 'Perfil', icon: <FiUser /> },

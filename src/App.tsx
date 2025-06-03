@@ -5,6 +5,8 @@ import GlobalStyles from './styles/GlobalStyles.ts';
 import {darkTheme} from './styles/theme';
 import Instituicoes from "./pages/intituicao/Instituicoes.tsx";
 import CadastroInstituicao from "./pages/intituicao/CadastroInstituicao.tsx";
+import Profissionais from "./pages/profissional/Profissionais.tsx";
+import CadastroProfissional from "./pages/profissional/CadastroProfissional.tsx";
 
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
                         <Route path="/settings" element={<div>Página de Configurações</div>} />
                         <Route path="/instituicoes" element={<Instituicoes />} />
                         <Route path="/instituicoes/cadastro-instituicao" element={<CadastroInstituicao />} />
+                        <Route path="/profissionais" element={<Profissionais />} />
+                        <Route path="/profissionais/cadastro-profissional" element={<CadastroProfissional />} />
                     </Routes>
                 </Layout>
             </Router>
