@@ -1,3 +1,10 @@
+/**
+ * Componente de Cadastro de Profissional
+ * 
+ * Este componente permite o cadastro e edição de profissionais,
+ * usando um modal para gerenciar os dados pessoais.
+ */
+
 import React, {useState, useEffect} from "react";
 import {
     StatContent,
@@ -6,37 +13,58 @@ import {
     CardTitle,
     FixedHeader,
     ButtonStyled,
-    CardWrapper
+    CardWrapper,
+    Card
 } from "../../components/layout/DefaultComponents.tsx";
 import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
 import {InputPadrao} from "../../components/layout/InputPadrao.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {AutocompleteInstituicao} from "../../components/AutocompleteInstituicao.tsx";
-import {municipiosBrasileiros} from "../../mocks/municipios-mock.ts";
-import { Etnia } from "../../mocks/etnia.ts";
 import { Cargo } from "../../mocks/cargo.ts";
+import PessoaModal from "../../components/modal/PessoaModal.tsx";
+import { buscarPessoaPorCpf, type Pessoa, formatarCpf } from "../../services/pessoaService.ts";
+import styled from "styled-components";
+
+const InfoLink = styled.span`
+  color: ${({theme}) => theme.colors.primary};
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 10px;
+  font-size: 0.9em;
+  &:hover {
+    color: ${({theme}) => theme.colors.primaryLight};
+  }
+`;
+
+const SearchButton = styled(ButtonStyled)`
+  padding: 8px 16px;
+  margin-left: 10px;
+  height: 36px;
+`;
+
+const initialPessoaState: Pessoa = {
+  id: "",
+  nome: "",
+  cpf: "",
+  sexo: "",
+  etnia: "",
+  dataNascimento: "",
+  paisNaturalidade: { id: "", nome: "" },
+  ufNaturalidade: { id: "", sigla: "", nome: "" },
+  municipioNaturalidade: { id: "", nome: "", uf: "" },
+  nomeMae: "",
+  nomePai: "",
+  endereco: "",
+  email: "",
+  telefone: "",
+  dataCadastro: "",
+  dataAlteracao: ""
+};
 
 const initialFormState = {
     id: "",
-    pessoa: {
-        id: "",
-        nome: "",
-        cpf: "",
-        sexo: "",
-        etnia: "",
-        dataNascimento: "",
-        paisNaturalidade: { id: "", nome: "" },
-        ufNaturalidade: { id: "", sigla: "", nome: "" },
-        municipioNaturalidade: { id: "", nome: "", uf: "" },
-        nomeMae: "",
-        nomePai: "",
-        endereco: "",
-        email: "",
-        telefone: "",
-        dataCadastro: "",
-        dataAlteracao: ""
-    },
+    pessoa: initialPessoaState,
     instituicaoNome: "",
     instituicaoId: "",
     cargo: "",
@@ -47,6 +75,10 @@ const CadastroProfissional: React.FC = () => {
     const [form, setForm] = useState(initialFormState);
     const [submitted, setSubmitted] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [cpfSearch, setCpfSearch] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+    const [pessoaEncontrada, setPessoaEncontrada] = useState(false);
     const {isSidebarOpen} = useSidebar();
     const theme = useTheme();
     const location = useLocation();
@@ -88,27 +120,65 @@ const CadastroProfissional: React.FC = () => {
 
             // Marcar que estamos em modo de edição
             setIsEditing(true);
+            // Definir que já encontramos a pessoa
+            setPessoaEncontrada(true);
+            // Preencher o campo de busca de CPF
+            setCpfSearch(pessoaData.cpf || "");
         }
     }, [location]);
+
+    // Função para buscar pessoa por CPF
+    const buscarPessoa = async () => {
+        if (!cpfSearch || cpfSearch.length < 11) return;
+
+        setIsSearching(true);
+        try {
+            const resultado = await buscarPessoaPorCpf(cpfSearch);
+
+            if (resultado.encontrado) {
+                // Pessoa encontrada, atualizar o formulário
+                setForm(prev => ({
+                    ...prev,
+                    pessoa: resultado.pessoa as Pessoa
+                }));
+                setPessoaEncontrada(true);
+            } else {
+                // Pessoa não encontrada, limpar os dados da pessoa (exceto CPF)
+                setForm(prev => ({
+                    ...prev,
+                    pessoa: {
+                        ...initialPessoaState,
+                        cpf: formatarCpf(cpfSearch)
+                    }
+                }));
+                setPessoaEncontrada(false);
+                // Abrir o modal para cadastro de nova pessoa
+                setIsModalOpen(true);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar pessoa por CPF:", error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const {name, value, type} = e.target;
 
-        if (name.startsWith('pessoa.')) {
-            const pessoaField = name.split('.')[1];
-            setForm((prev) => ({
-                ...prev,
-                pessoa: {
-                    ...prev.pessoa,
-                    [pessoaField]: value
-                }
-            }));
-        } else {
-            setForm((prev) => ({
-                ...prev,
-                [name]: type === "checkbox" && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value,
-            }));
+        // Para o campo de CPF na busca
+        if (name === "cpfSearch") {
+            // Limitar a 14 caracteres (formato 000.000.000-00)
+            if (value.length <= 14) {
+                setCpfSearch(formatarCpf(value));
+            }
+            return;
         }
+
+        // Para os outros campos do formulário
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value,
+        }));
     }
 
     function handleInstituicaoSelect(instituicao: any) {
@@ -118,72 +188,36 @@ const CadastroProfissional: React.FC = () => {
             instituicaoNome: instituicao.nome
         }));
     }
-
-    function handleUfSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-        const ufSigla = e.target.value;
-        setForm((prev) => ({
+// Função para salvar os dados da pessoa do modal
+    function handleSavePessoa(pessoaData: Pessoa) {
+        setForm(prev => ({
             ...prev,
-            pessoa: {
-                ...prev.pessoa,
-                ufNaturalidade: {
-                    id: "",  // Idealmente você buscaria o ID real da UF
-                    sigla: ufSigla,
-                    nome: ufSigla ? e.target.options[e.target.selectedIndex].text : ""
-                },
-                municipioNaturalidade: {
-                    id: "",
-                    nome: "",
-                    uf: ufSigla
-                }
-            }
+            pessoa: pessoaData
         }));
-    }
-
-    function handleMunicipioSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-        const municipioNome = e.target.value;
-        const ufSigla = form.pessoa.ufNaturalidade.sigla;
-        const municipio = municipiosBrasileiros.find(m => m.nome === municipioNome && m.uf === ufSigla);
-
-        if (municipio) {
-            setForm((prev) => ({
-                ...prev,
-                pessoa: {
-                    ...prev.pessoa,
-                    municipioNaturalidade: {
-                        id: "", // Idealmente, você buscaria o ID real do município
-                        nome: municipio.nome,
-                        uf: municipio.uf
-                    }
-                }
-            }));
-        }
+        setPessoaEncontrada(true);
     }
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        // Verificar se temos pessoa selecionada/cadastrada
+        if (!pessoaEncontrada || !form.pessoa.id) {
+            alert("É necessário selecionar ou cadastrar uma pessoa primeiro.");
+            return;
+        }
+
+        // Verificar campos obrigatórios específicos do profissional
+        if (!form.instituicaoId || !form.cargo) {
+            alert("Preencha todos os campos obrigatórios.");
+            return;
+        }
+
         setSubmitted(true);
 
         // Preparar objeto a ser enviado para a API
         const profissionalPayload = {
             id: form.id,
-            pessoa: {
-                id: form.pessoa.id,
-                nome: form.pessoa.nome,
-                cpf: form.pessoa.cpf,
-                sexo: form.pessoa.sexo,
-                etnia: form.pessoa.etnia,
-                dataNascimento: form.pessoa.dataNascimento,
-                paisNaturalidade: form.pessoa.paisNaturalidade,
-                ufNaturalidade: form.pessoa.ufNaturalidade,
-                municipioNaturalidade: form.pessoa.municipioNaturalidade,
-                nomeMae: form.pessoa.nomeMae,
-                nomePai: form.pessoa.nomePai,
-                endereco: form.pessoa.endereco,
-                email: form.pessoa.email,
-                telefone: form.pessoa.telefone,
-                dataCadastro: form.pessoa.dataCadastro || new Date().toISOString(),
-                dataAlteracao: new Date().toISOString()
-            },
+            pessoa: form.pessoa,
             instituicaoEnsino: {
                 id: form.instituicaoId
             },
@@ -230,219 +264,55 @@ const CadastroProfissional: React.FC = () => {
                     $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
                 >
                     <form onSubmit={handleSubmit}>
+                        <div style={{ marginBottom: 20, display: "flex", alignItems: "center" }}>
+                            <StatLabel style={{ width: "40%", marginBottom: 0 }}>
+                                Buscar por CPF:
+                                <InputPadrao
+                                    type="text"
+                                    name="cpfSearch"
+                                    value={cpfSearch}
+                                    onChange={handleChange}
+                                    placeholder="Digite o CPF..."
+                                    disabled={submitted || isSearching}
+                                />
+                            </StatLabel>
+                            <SearchButton 
+                                type="button" 
+                                onClick={buscarPessoa} 
+                                disabled={submitted || isSearching || cpfSearch.length < 11}
+                            >
+                                {isSearching ? "Buscando..." : "Buscar"}
+                            </SearchButton>
+                        </div>
                         <StatContent>
-                            <StatLabel>
-                                Nome:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.nome"
-                                    value={form.pessoa.nome}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                CPF:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.cpf"
-                                    value={form.pessoa.cpf}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Sexo:
-                                <select
-                                    name="pessoa.sexo"
-                                    value={form.pessoa.sexo}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                    style={{
-                                        width: "80%",
-                                        padding: 8,
-                                        marginTop: 4,
-                                        marginBottom: 4,
-                                        display: "block"
-                                    }}
-                                >
-                                    <option value="">Selecione...</option>
-                                    <option value="M">Masculino</option>
-                                    <option value="F">Feminino</option>
-                                </select>
-                            </StatLabel>
-                            <StatLabel>
-                                Etnia:
-                                <select
-                                    name="pessoa.etnia"
-                                    value={form.pessoa.etnia}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                    style={{
-                                        width: "80%",
-                                        padding: 8,
-                                        marginTop: 4,
-                                        marginBottom: 4,
-                                        display: "block"
-                                    }}
-                                >
-                                    <option value="">Selecione...</option>
-                                    {Object.values(Etnia).map(etnia => (
-                                        <option key={etnia} value={etnia}>{etnia}</option>
-                                    ))}
-                                </select>
-                            </StatLabel>
-                            <StatLabel>
-                                Data de Nascimento:
-                                <InputPadrao
-                                    type="date"
-                                    name="pessoa.dataNascimento"
-                                    value={form.pessoa.dataNascimento}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Nome da Mãe:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.nomeMae"
-                                    value={form.pessoa.nomeMae}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Nome do Pai:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.nomePai"
-                                    value={form.pessoa.nomePai}
-                                    onChange={handleChange}
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Endereço:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.endereco"
-                                    value={form.pessoa.endereco}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Email:
-                                <InputPadrao
-                                    type="email"
-                                    name="pessoa.email"
-                                    value={form.pessoa.email}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Telefone:
-                                <InputPadrao
-                                    type="tel"
-                                    name="pessoa.telefone"
-                                    value={form.pessoa.telefone}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                País de Naturalidade:
-                                <InputPadrao
-                                    type="text"
-                                    name="pessoa.paisNaturalidade.nome"
-                                    value={form.pessoa.paisNaturalidade.nome}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                />
-                                                            </StatLabel>
-                                                            <StatLabel>
-                                UF de Naturalidade:
-                                <select
-                                    name="pessoa.ufNaturalidade.sigla"
-                                    value={form.pessoa.ufNaturalidade.sigla}
-                                    onChange={handleUfSelect}
-                                    required
-                                    disabled={submitted}
-                                    style={{
-                                        width: "80%",
-                                        padding: 8,
-                                        marginTop: 4,
-                                        marginBottom: 4,
-                                        display: "block"
-                                    }}
-                                >
-                                    <option value="">Selecione...</option>
-                                    <option value="AC">Acre</option>
-                                    <option value="AL">Alagoas</option>
-                                    <option value="AP">Amapá</option>
-                                    <option value="AM">Amazonas</option>
-                                    <option value="BA">Bahia</option>
-                                    <option value="CE">Ceará</option>
-                                    <option value="DF">Distrito Federal</option>
-                                    <option value="ES">Espírito Santo</option>
-                                    <option value="GO">Goiás</option>
-                                    <option value="MA">Maranhão</option>
-                                    <option value="MT">Mato Grosso</option>
-                                    <option value="MS">Mato Grosso do Sul</option>
-                                    <option value="MG">Minas Gerais</option>
-                                    <option value="PA">Pará</option>
-                                    <option value="PB">Paraíba</option>
-                                    <option value="PR">Paraná</option>
-                                    <option value="PE">Pernambuco</option>
-                                    <option value="PI">Piauí</option>
-                                    <option value="RJ">Rio de Janeiro</option>
-                                    <option value="RN">Rio Grande do Norte</option>
-                                    <option value="RS">Rio Grande do Sul</option>
-                                    <option value="RO">Rondônia</option>
-                                    <option value="RR">Roraima</option>
-                                    <option value="SC">Santa Catarina</option>
-                                    <option value="SP">São Paulo</option>
-                                    <option value="SE">Sergipe</option>
-                                    <option value="TO">Tocantins</option>
-                                </select>
-                            </StatLabel>
-                            <StatLabel>
-                                Município de Naturalidade:
-                                <select
-                                    name="pessoa.municipioNaturalidade.nome"
-                                    value={form.pessoa.municipioNaturalidade.nome}
-                                    onChange={handleMunicipioSelect}
-                                    required
-                                    disabled={submitted || !form.pessoa.ufNaturalidade.sigla}
-                                    style={{
-                                        width: "80%",
-                                        padding: 8,
-                                        marginTop: 4,
-                                        marginBottom: 4,
-                                        display: "block"
-                                    }}
-                                >
-                                    <option value="">Selecione...</option>
-                                    {municipiosBrasileiros
-                                        .filter(m => m.uf === form.pessoa.ufNaturalidade.sigla)
-                                        .map(municipio => (
-                                            <option key={municipio.nome} value={municipio.nome}>{municipio.nome}</option>
-                                        ))
-                                    }
-                                </select>
-                            </StatLabel>
+                            {pessoaEncontrada ? (
+                                <Card style={{ padding: 20, marginBottom: 20 }}>
+                                    <h3 style={{ marginTop: 0 }}>Dados Pessoais</h3>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                                        <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
+                                        <StatLabel>CPF: <span>{form.pessoa.cpf}</span></StatLabel>
+                                        <StatLabel>Data de Nascimento: <span>{form.pessoa.dataNascimento}</span></StatLabel>
+                                        <StatLabel>Sexo: <span>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</span></StatLabel>
+                                        <StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>
+                                        <StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>
+                                    </div>
+                                    <div style={{ textAlign: "right", marginTop: 10 }}>
+                                        <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
+                                    </div>
+                                </Card>
+                            ) : (
+                                <Card style={{ padding: 20, marginBottom: 20, textAlign: "center" }}>
+                                    <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
+                                    <ButtonStyled 
+                                        type="button" 
+                                        onClick={() => setIsModalOpen(true)}
+                                        disabled={submitted}
+                                    >
+                                        Cadastrar Nova Pessoa
+                                    </ButtonStyled>
+                                </Card>
+                            )}
+                            <h3>Dados Profissionais</h3>
                             <StatLabel>
                                 Instituição de Ensino:
                                 <AutocompleteInstituicao
@@ -488,6 +358,13 @@ const CadastroProfissional: React.FC = () => {
                                 Ativo
                             </StatLabel>
                         </StatContent>
+
+                        {/* Modal para edição/cadastro de dados pessoais */}
+                        <PessoaModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            onSave={handleSavePessoa}
+                                                    />
                         <div style={{marginTop: 24, textAlign: "right"}}>
                             <ButtonStyled 
                                 type="button" 

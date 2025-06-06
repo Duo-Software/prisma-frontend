@@ -75,7 +75,17 @@ export const mockProfissionais = [
       id: 104,
       nome: "Ana Santos",
       email: "ana.santos@email.com",
-      telefone: "(65) 99955-4444"
+      telefone: "(65) 99955-4444",
+      etnia: Etnia.PARDA,
+      dataNascimento: "1990-05-20",
+      paisNaturalidade: { id: 1, nome: "Brasil" },
+      ufNaturalidade: { id: 13, sigla: "MT", nome: "Mato Grosso" },
+      municipioNaturalidade: { id: 142, nome: "Cuiabá", uf: "MT" },
+      nomeMae: "Ana Oliveira",
+      nomePai: "Pedro Oliveira",
+      endereco: "Avenida Central, 456",
+      dataCadastro: "2024-01-10T14:20:00",
+      dataAlteracao: "2024-05-12T09:15:00"
     },
     instituicaoEnsino: mockInstitutions[0],
     cargo: Cargo.SECRETARIO,
