@@ -7,14 +7,13 @@
 
 import React, {useState, useEffect} from "react";
 import {
-    StatContent,
     StatLabel,
     DefaultContainer,
     CardTitle,
     FixedHeader,
     ButtonStyled,
     CardWrapper,
-    Card
+    CardFixed, StatContentFixed
 } from "../../components/layout/DefaultComponents.tsx";
 import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
@@ -79,6 +78,7 @@ const CadastroProfissional: React.FC = () => {
     const [cpfSearch, setCpfSearch] = useState("");
     const [isSearching, setIsSearching] = useState(false);
     const [pessoaEncontrada, setPessoaEncontrada] = useState(false);
+    const [buscaEfetuada, setBuscaEfetuada] = useState(false);
     const {isSidebarOpen} = useSidebar();
     const theme = useTheme();
     const location = useLocation();
@@ -131,6 +131,7 @@ const CadastroProfissional: React.FC = () => {
     const buscarPessoa = async () => {
         if (!cpfSearch || cpfSearch.length < 11) return;
 
+        setBuscaEfetuada(true);
         setIsSearching(true);
         try {
             const resultado = await buscarPessoaPorCpf(cpfSearch);
@@ -264,100 +265,130 @@ const CadastroProfissional: React.FC = () => {
                     $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
                 >
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: 20, display: "flex", alignItems: "center" }}>
-                            <StatLabel style={{ width: "40%", marginBottom: 0 }}>
+                        <CardFixed
+                            style={{
+                                padding: 20,
+                                marginBottom: 20,
+                                display: "flex",
+                                flexDirection: "row", // garante alinhamento horizontal
+                                alignItems: "center",  // alinha ao centro verticalmente
+                                gap: 16,               // espaço entre elementos (opcional, para espaçamento)
+                                textAlign: "center",
+                            }}
+                        >
+                            <StatLabel style={{ marginBottom: 0, marginRight: 8 }}>
                                 Buscar por CPF:
-                                <InputPadrao
-                                    type="text"
-                                    name="cpfSearch"
-                                    value={cpfSearch}
-                                    onChange={handleChange}
-                                    placeholder="Digite o CPF..."
-                                    disabled={submitted || isSearching}
-                                />
                             </StatLabel>
-                            <SearchButton 
-                                type="button" 
-                                onClick={buscarPessoa} 
+                            <InputPadrao
+                                type="text"
+                                name="cpfSearch"
+                                value={cpfSearch}
+                                onChange={handleChange}
+                                placeholder="Digite o CPF..."
+                                disabled={submitted || isSearching}
+                                style={{ marginLeft: 8 }} // Opcional: espaço entre label e input
+                            />
+                            <SearchButton
+                                style={{ width: "90px" }}
+                                type="button"
+                                onClick={buscarPessoa}
                                 disabled={submitted || isSearching || cpfSearch.length < 11}
                             >
                                 {isSearching ? "Buscando..." : "Buscar"}
                             </SearchButton>
-                        </div>
-                        <StatContent>
+                        </CardFixed>
+
+                        <StatContentFixed style={{alignItems: "center", justifyContent: "center", textAlign: "center"}}>
                             {pessoaEncontrada ? (
-                                <Card style={{ padding: 20, marginBottom: 20 }}>
-                                    <h3 style={{ marginTop: 0 }}>Dados Pessoais</h3>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                                <CardFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
+                                    <h3 style={{marginTop: 0}}>Dados Pessoais</h3>
+                                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
                                         <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
                                         <StatLabel>CPF: <span>{form.pessoa.cpf}</span></StatLabel>
-                                        <StatLabel>Data de Nascimento: <span>{form.pessoa.dataNascimento}</span></StatLabel>
+                                        <StatLabel>Data de
+                                            Nascimento: <span>{form.pessoa.dataNascimento}</span></StatLabel>
                                         <StatLabel>Sexo: <span>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</span></StatLabel>
                                         <StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>
                                         <StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>
                                     </div>
-                                    <div style={{ textAlign: "right", marginTop: 10 }}>
+                                    <div style={{textAlign: "right", marginTop: 10}}>
                                         <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
                                     </div>
-                                </Card>
-                            ) : (
-                                <Card style={{ padding: 20, marginBottom: 20, textAlign: "center" }}>
+                                </CardFixed>
+                            ) : buscaEfetuada ? (
+                                <CardFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
                                     <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
-                                    <ButtonStyled 
-                                        type="button" 
+                                    <ButtonStyled
+                                        type="button"
                                         onClick={() => setIsModalOpen(true)}
                                         disabled={submitted}
                                     >
                                         Cadastrar Nova Pessoa
                                     </ButtonStyled>
-                                </Card>
-                            )}
-                            <h3>Dados Profissionais</h3>
-                            <StatLabel>
-                                Instituição de Ensino:
-                                <AutocompleteInstituicao
-                                    name="instituicaoNome"
-                                    value={form.instituicaoNome}
-                                    onChange={handleChange}
-                                    onSelect={handleInstituicaoSelect}
-                                    required
-                                    disabled={submitted}
-                                />
-                            </StatLabel>
-                            <StatLabel>
-                                Cargo:
-                                <select
-                                    name="cargo"
-                                    value={form.cargo}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={submitted}
-                                    style={{
-                                        width: "80%",
-                                        padding: 8,
-                                        marginTop: 4,
-                                        marginBottom: 4,
-                                        display: "block"
-                                    }}
-                                >
-                                    <option value="">Selecione...</option>
-                                    {Object.values(Cargo).map(cargo => (
-                                        <option key={cargo} value={cargo}>{cargo}</option>
-                                    ))}
-                                </select>
-                            </StatLabel>
-                            <StatLabel style={{display: "flex", alignItems: "center"}}>
-                                <input
-                                    type="checkbox"
-                                    name="ativo"
-                                    checked={form.ativo}
-                                    onChange={handleChange}
-                                    disabled={submitted}
-                                    style={{marginRight: 8}}
-                                />
-                                Ativo
-                            </StatLabel>
-                        </StatContent>
+                                </CardFixed>
+                            ) : null}
+
+                            <StatContentFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
+                                <CardFixed >
+                                    <h3>Dados Profissionais</h3>
+                                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
+                                    <StatLabel>
+                                        Instituição de Ensino:
+                                    </StatLabel>
+                                    <AutocompleteInstituicao
+                                        name="instituicaoNome"
+                                        value={form.instituicaoNome}
+                                        onChange={handleChange}
+                                        onSelect={handleInstituicaoSelect}
+                                        required
+                                        disabled={submitted}
+                                    />
+                                    <StatLabel>
+                                        Cargo:
+
+                                    </StatLabel>
+                                    <select
+                                        name="cargo"
+                                        value={form.cargo}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={submitted}
+                                        style={{
+                                            width: "80%",
+                                            padding: 8,
+                                            marginTop: 4,
+                                            marginBottom: 4,
+                                            display: "block"
+                                        }}
+                                    >
+                                        <option value="">Selecione...</option>
+                                        {Object.values(Cargo).map(cargo => (
+                                            <option key={cargo} value={cargo}>{cargo}</option>
+                                        ))}
+                                    </select>
+                                        <StatLabel
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "flex-end",
+                                                alignItems: "center",
+                                                marginRight: 32
+                                            }}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                name="ativo"
+                                                checked={form.ativo}
+                                                onChange={handleChange}
+                                                disabled={submitted}
+                                                style={{marginRight: 8}}
+                                            />
+                                            Ativo
+                                        </StatLabel>
+
+                                    </div>
+                                </CardFixed>
+                            </StatContentFixed>
+                        </StatContentFixed>
 
                         {/* Modal para edição/cadastro de dados pessoais */}
                         <PessoaModal

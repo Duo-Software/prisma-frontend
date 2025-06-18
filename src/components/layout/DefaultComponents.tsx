@@ -66,6 +66,34 @@ export const Card = styled.div`
     }
 `;
 
+export const CardFixed = styled.div`
+    cursor: pointer;
+    background-color: ${props => props.theme.colors.surface};
+    border-radius: ${props => props.theme.borderRadius};
+    padding: 1.25rem;
+    box-shadow: ${props => props.theme.boxShadow};
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-width: 60%;
+    width: 100%;
+    margin: 0 auto;
+
+    @media (max-width: 768px) {
+        max-width: 90%;
+    }
+
+    @media (max-width: 480px) {
+        max-width: 95%;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    }
+`;
+
 interface StatIconWrapperProps {
     $bgColor: string;
 }
@@ -85,6 +113,15 @@ export const StatContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+`;
+
+export const StatContentFixed = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 `;
 
 export const StatValue = styled.div`

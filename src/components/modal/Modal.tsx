@@ -1,4 +1,4 @@
-import React, { useEffect, ReactNode } from 'react';
+import React, { useEffect, type ReactNode } from 'react';
 import styled from 'styled-components';
 
 interface ModalProps {
@@ -24,7 +24,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div<{ width?: string; height?: string }>`
-  background-color: ${({ theme }) => theme.colors.cardBg};
+  background-color: ${({ theme }) => theme.colors.background};
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   padding: 20px;
