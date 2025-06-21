@@ -1,0 +1,17 @@
+export const mockAlunos = [
+    { id: 1, nome: "Ana Paula Souza", matricula: "20230001", curso: "Engenharia Civil", ativo: true },
+    { id: 2, nome: "Bruno Henrique Lima", matricula: "20230002", curso: "Direito", ativo: true },
+    { id: 3, nome: "Carla Mendes", matricula: "20230003", curso: "Medicina", ativo: false },
+    { id: 4, nome: "Diego Farias", matricula: "20230004", curso: "Administração", ativo: true },
+    { id: 5, nome: "Eduarda Silva", matricula: "20230005", curso: "Psicologia", ativo: true },
+    { id: 6, nome: "Felipe Santos", matricula: "20230006", curso: "Engenharia de Produção", ativo: false },
+    { id: 7, nome: "Gabriela Costa", matricula: "20230007", curso: "Arquitetura", ativo: true },
+    { id: 8, nome: "Henrique Almeida", matricula: "20230008", curso: "Ciência da Computação", ativo: true },
+    { id: 9, nome: "Isabela Martins", matricula: "20230009", curso: "Enfermagem", ativo: false },
+    { id: 10, nome: "João Pedro Ramos", matricula: "20230010", curso: "Engenharia Elétrica", ativo: true },
+    { id: 11, nome: "Karina Lopes", matricula: "20230011", curso: "Biomedicina", ativo: true },
+    { id: 12, nome: "Lucas Oliveira", matricula: "20230012", curso: "Fisioterapia", ativo: false },
+    { id: 13, nome: "Mariana Dias", matricula: "20230013", curso: "Nutrição", ativo: true },
+    { id: 14, nome: "Nicolas Ferreira", matricula: "20230014", curso: "Engenharia Mecânica", ativo: true },
+    { id: 15, nome: "Olívia Rocha", matricula: "20230015", curso: "Publicidade e Propaganda", ativo: true },
+];

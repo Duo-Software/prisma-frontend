@@ -7,6 +7,7 @@ import Instituicoes from "./pages/intituicao/Instituicoes.tsx";
 import CadastroInstituicao from "./pages/intituicao/CadastroInstituicao.tsx";
 import Profissionais from "./pages/profissional/Profissionais.tsx";
 import CadastroProfissional from "./pages/profissional/CadastroProfissional.tsx";
+import Login from "./pages/logon/login.tsx";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                 <Layout>
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
+                        <Route path="/login" element={<Login />} />
                         <Route path="/profile" element={<div>Página de Perfil</div>} />
                         <Route path="/settings" element={<div>Página de Configurações</div>} />
                         <Route path="/instituicoes" element={<Instituicoes />} />
