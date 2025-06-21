@@ -8,6 +8,8 @@ import CadastroInstituicao from "./pages/intituicao/CadastroInstituicao.tsx";
 import Profissionais from "./pages/profissional/Profissionais.tsx";
 import CadastroProfissional from "./pages/profissional/CadastroProfissional.tsx";
 import Login from "./pages/logon/login.tsx";
+import Alunos from "./pages/aluno/Alunos.tsx";
+import CadastroAluno from "./pages/aluno/CadastroAluno.tsx";
 
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
                         <Route path="/instituicoes/cadastro-instituicao" element={<CadastroInstituicao />} />
                         <Route path="/profissionais" element={<Profissionais />} />
                         <Route path="/profissionais/cadastro-profissional" element={<CadastroProfissional />} />
+                        <Route path="/alunos" element={<Alunos />} />
+                        <Route path="/alunos/cadastro-aluno" element={<CadastroAluno />} />
                     </Routes>
                 </Layout>
             </Router>

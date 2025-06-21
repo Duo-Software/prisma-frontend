@@ -24,6 +24,26 @@ export const DefaultContainer = styled.div`
     padding: 1rem 0;
 `;
 
+export const LoginContainer = styled.div<{ $isSidebarOpen?: boolean }>`
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: ${props => props.theme.sizes.headerHeight};
+    left: ${props => props.$isSidebarOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed};
+    right: 0;
+    bottom: 0;
+    width: calc(100vw - ${props => props.$isSidebarOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed});
+    height: calc(100vh - ${props => props.theme.sizes.headerHeight});
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    z-index: 100;
+    transition: left ${props => props.theme.transition}, width ${props => props.theme.transition};
+`;
+
+
 
 export const CardTitle = styled.h2`
   font-size: 1.15rem;

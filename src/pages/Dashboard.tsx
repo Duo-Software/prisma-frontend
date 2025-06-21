@@ -17,19 +17,21 @@ export const Dashboard: React.FC = () => {
         <DashboardContainer>
 
             <StatsGrid>
-                <Card style={{ minHeight: 240 }}>
-                    <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
-                        <BiSmile color="#0ea5e9"/>
-                    </StatIconWrapper>
-                    <StatContent>
-                        <StatValue>2340</StatValue>
-                        <StatLabel>Alunos</StatLabel>
-                        <StatFooter>
-                            <StatChange $isPositive={true}>+8.2%</StatChange>
-                            <StatPeriod>desde o mês passado</StatPeriod>
-                        </StatFooter>
-                    </StatContent>
-                </Card>
+                <Link to="/alunos" style={{textDecoration: "none"}}>
+                    <Card style={{ minHeight: 240 }}>
+                        <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                            <BiSmile color="#0ea5e9"/>
+                        </StatIconWrapper>
+                        <StatContent>
+                            <StatValue>2340</StatValue>
+                            <StatLabel>Alunos</StatLabel>
+                            <StatFooter>
+                                <StatChange $isPositive={true}>+8.2%</StatChange>
+                                <StatPeriod>desde o mês passado</StatPeriod>
+                            </StatFooter>
+                        </StatContent>
+                    </Card>
+                </Link>
             </StatsGrid>
 
             <StatsGrid>
