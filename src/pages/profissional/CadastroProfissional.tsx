@@ -13,7 +13,7 @@ import {
     FixedHeader,
     ButtonStyled,
     CardWrapper,
-    CardFixed, StatContentFixed
+    CardFixed, CardGrid
 } from "../../components/layout/DefaultComponents.tsx";
 import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
@@ -24,6 +24,7 @@ import { Cargo } from "../../mocks/cargo.ts";
 import PessoaModal from "../../components/modal/PessoaModal.tsx";
 import { buscarPessoaPorCpf, type Pessoa, formatarCpf } from "../../services/pessoaService.ts";
 import styled from "styled-components";
+import {CustomSelect} from "../../components/layout/CustomSelect.tsx";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -269,6 +270,7 @@ const CadastroProfissional: React.FC = () => {
                             style={{
                                 padding: 20,
                                 marginBottom: 20,
+                                minWidth: 450,
                                 display: "flex",
                                 flexDirection: "row", // garante alinhamento horizontal
                                 alignItems: "center",  // alinha ao centro verticalmente
@@ -298,9 +300,8 @@ const CadastroProfissional: React.FC = () => {
                             </SearchButton>
                         </CardFixed>
 
-                        <StatContentFixed style={{alignItems: "center", justifyContent: "center", textAlign: "center"}}>
                             {pessoaEncontrada ? (
-                                <CardFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
+                                <CardFixed style={{padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center"}}>
                                     <h3 style={{marginTop: 0}}>Dados Pessoais</h3>
                                     <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
                                         <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
@@ -316,7 +317,7 @@ const CadastroProfissional: React.FC = () => {
                                     </div>
                                 </CardFixed>
                             ) : buscaEfetuada ? (
-                                <CardFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
+                                <CardFixed style={{padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center"}}>
                                     <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
                                     <ButtonStyled
                                         type="button"
@@ -328,44 +329,39 @@ const CadastroProfissional: React.FC = () => {
                                 </CardFixed>
                             ) : null}
 
-                            <StatContentFixed style={{padding: 20, marginBottom: 20, textAlign: "center"}}>
-                                <CardFixed >
+                                <CardGrid style={{padding: 20, minWidth: 450, marginBottom: 20}}>
                                     <h3>Dados Profissionais</h3>
-                                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
-                                    <StatLabel>
-                                        Instituição de Ensino:
-                                    </StatLabel>
-                                    <AutocompleteInstituicao
-                                        name="instituicaoNome"
-                                        value={form.instituicaoNome}
-                                        onChange={handleChange}
-                                        onSelect={handleInstituicaoSelect}
-                                        required
-                                        disabled={submitted}
-                                    />
-                                    <StatLabel>
-                                        Cargo:
+                                    <h3></h3>
+                                        <StatLabel>
+                                            Instituição de Ensino:
+                                            <AutocompleteInstituicao
+                                                name="instituicaoNome"
+                                                value={form.instituicaoNome}
+                                                onChange={handleChange}
+                                                onSelect={handleInstituicaoSelect}
+                                                required
+                                                disabled={submitted}
+                                            />
+                                        </StatLabel>
 
-                                    </StatLabel>
-                                    <select
-                                        name="cargo"
-                                        value={form.cargo}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={submitted}
-                                        style={{
-                                            width: "80%",
-                                            padding: 8,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                            display: "block"
-                                        }}
-                                    >
-                                        <option value="">Selecione...</option>
-                                        {Object.values(Cargo).map(cargo => (
-                                            <option key={cargo} value={cargo}>{cargo}</option>
-                                        ))}
-                                    </select>
+                                        <StatLabel>
+                                            Cargo:
+                                            <CustomSelect
+                                                name="cargo"
+                                                value={form.cargo}
+                                                onChange={handleChange}
+                                                options={Object.values(Cargo).map(cargo => ({
+                                                    value: cargo,
+                                                    label: cargo
+                                                }))}
+                                                required
+                                                disabled={submitted}
+                                                textColor={theme.colors.textSecondary}
+                                                selectedTextColor={theme.colors.primaryLight}
+                                            />
+                                        </StatLabel>
+
+
                                         <StatLabel
                                             style={{
                                                 display: "flex",
@@ -384,11 +380,7 @@ const CadastroProfissional: React.FC = () => {
                                             />
                                             Ativo
                                         </StatLabel>
-
-                                    </div>
-                                </CardFixed>
-                            </StatContentFixed>
-                        </StatContentFixed>
+                                </CardGrid>
 
                         {/* Modal para edição/cadastro de dados pessoais */}
                         <PessoaModal

@@ -76,21 +76,41 @@ export const CardFixed = styled.div`
     flex-direction: column;
     gap: 1rem;
     transition: transform 0.2s, box-shadow 0.2s;
-    max-width: 60%;
-    width: 100%;
+    min-width: 40%;
+    max-width: 800px;
     margin: 0 auto;
 
     @media (max-width: 768px) {
-        max-width: 90%;
+        max-width: 100%;
     }
 
     @media (max-width: 480px) {
-        max-width: 95%;
+        max-width: 100%;
     }
+
 
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    }
+`;
+
+export const CardGrid = styled.div`
+    cursor: pointer;
+    background-color: ${props => props.theme.colors.surface};
+    border-radius: ${props => props.theme.borderRadius};
+    padding: 1.25rem;
+    box-shadow: ${props => props.theme.boxShadow};
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-width: 40%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    
+    @media (max-width: 768px) {
+    grid-template-columns: 1fr;
     }
 `;
 
@@ -121,7 +141,6 @@ export const StatContentFixed = styled.div`
   gap: 0.25rem;
   align-items: center;
   justify-content: center;
-  width: 100%;
 `;
 
 export const StatValue = styled.div`
@@ -274,6 +293,7 @@ export const FormContainer = styled.div<FixedHeaderProps>`
 
 export const CardWrapper = styled.div<FixedHeaderProps>`
     z-index: 110;
+    box-sizing: border-box;
     position: page;
     width: calc(
             97.5vw - ${props =>
@@ -282,15 +302,20 @@ export const CardWrapper = styled.div<FixedHeaderProps>`
                             : props.theme.sizes.sidebarWidthCollapsed}
     );
 
-    margin: 32px auto;
+    margin: 32px;
     background-color: ${({ theme }) => theme.colors.background};
     box-shadow: 0 2px 16px rgba(0,0,0,0.1);
     border-radius: ${props => props.theme.borderRadius};
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
+    max-width: 800px;
+    left: 50%;
     transition: max-width ${props => props.theme.transition};
 `;
+
+
+
 
 export const alignRightStyle = { alignItems: 'center', justifyContent: 'flex-end', marginLeft: 'auto' };
 

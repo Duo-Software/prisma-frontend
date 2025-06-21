@@ -5,7 +5,6 @@ import {BsBuilding} from "react-icons/bs";
 import {Link} from "react-router-dom";
 import {
     Card,
-    CardTitle, ContentCard,
     DashboardContainer, StatChange,
     StatContent, StatFooter,
     StatIconWrapper, StatLabel, StatPeriod,
@@ -18,8 +17,7 @@ export const Dashboard: React.FC = () => {
         <DashboardContainer>
 
             <StatsGrid>
-                <Card>
-                    <CardTitle>Total de alunos</CardTitle>
+                <Card style={{ minHeight: 240 }}>
                     <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
                         <BiSmile color="#0ea5e9"/>
                     </StatIconWrapper>
@@ -36,13 +34,17 @@ export const Dashboard: React.FC = () => {
 
             <StatsGrid>
                 <Link to="/Instituicoes" style={{textDecoration: "none"}}>
-                    <Card>
+                    <Card style={{ minHeight: 240 }}>
                         <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
                             <BsBuilding color="#0ea5e9"/>
                         </StatIconWrapper>
                         <StatContent>
                             <StatValue>2340</StatValue>
                             <StatLabel>Instituições de ensino</StatLabel>
+                            <StatFooter>
+                                <StatChange $isPositive={true}></StatChange>
+                                <StatPeriod>dedadsa</StatPeriod>
+                            </StatFooter>
                         </StatContent>
                     </Card>
                 </Link>
@@ -50,7 +52,7 @@ export const Dashboard: React.FC = () => {
 
             <StatsGrid>
                 <Link to="/profissionais" style={{textDecoration: "none"}}>
-                    <Card>
+                    <Card style={{ minHeight: 240 }}>
                         <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
                             <BiBriefcase color="#0ea5e9"/>
                         </StatIconWrapper>
@@ -63,9 +65,9 @@ export const Dashboard: React.FC = () => {
             </StatsGrid>
 
             <StatsGrid>
-                <Card>
-                    <StatIconWrapper $bgColor="rgba(245, 158, 11, 0.15)">
-                        <FiUsers color="#f59e0b"/>
+                <Card style={{ minHeight: 240 }}>
+                    <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                        <FiUsers color="#0ea5e9"/>
                     </StatIconWrapper>
                     <StatContent>
                         <StatValue>854</StatValue>
@@ -80,30 +82,14 @@ export const Dashboard: React.FC = () => {
             </StatsGrid>
 
             <StatsGrid>
-                <Card>
-                    <StatIconWrapper $bgColor="rgba(34, 197, 94, 0.15)">
-                        <FiFileMinus color="#22c55e"/>
+                <Card style={{ minHeight: 240 }}>
+                    <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                        <FiFileMinus color="#0ea5e9"/>
                     </StatIconWrapper>
                     <StatContent>
                         <StatValue>432</StatValue>
                         <StatLabel>Relatórios</StatLabel>
                     </StatContent>
-                    <StatFooter>
-                        <StatChange $isPositive={false}>-3.1%</StatChange>
-                        <StatPeriod>desde o mês passado</StatPeriod>
-                    </StatFooter>
-                </Card>
-            </StatsGrid>
-            <StatsGrid>
-                <Card>
-                    <StatContent>
-                        <StatValue>432</StatValue>
-                        <StatLabel>Relatórios</StatLabel>
-                    </StatContent>
-                    <ContentCard>
-                        Conteudo aqui
-                    </ContentCard>
-
                     <StatFooter>
                         <StatChange $isPositive={false}>-3.1%</StatChange>
                         <StatPeriod>desde o mês passado</StatPeriod>
