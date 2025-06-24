@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     DashboardContainer,
@@ -12,17 +12,37 @@ import {
     StatChange,
     FixedHeader, ButtonStyled, ButtonCardStyled
 } from "../../components/layout/DefaultComponents.tsx";
-import { mockInstitutions } from "../../mocks/instituicoes-mock.ts";
+import { buscarInstituicoes, type Instituicao } from "../../services/instituicaoService.ts";
 import {useSidebar} from "../../context/SidebarContext.tsx";
 import {useTheme} from "styled-components";
 import {FiEdit, FiPlus} from "react-icons/fi";
 
 const Instituicoes: React.FC = () => {
     const [search, setSearch] = useState("");
-    const [institutions] = useState(mockInstitutions);
+    const [institutions, setInstitutions] = useState<Instituicao[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const carregarInstituicoes = async () => {
+            try {
+                setLoading(true);
+                const data = await buscarInstituicoes();
+                setInstitutions(data);
+                setError(null);
+            } catch (err) {
+                console.error("Erro ao carregar instituições:", err);
+                setError("Erro ao carregar instituições. Por favor, tente novamente.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        carregarInstituicoes();
+    }, []);
 
 
     // Filtrar instituições conforme busca, só aplica filtro com mais de 3 caracteres
@@ -54,6 +74,7 @@ const Instituicoes: React.FC = () => {
                 >
                     <CardTitle>
                         <h1>Instituições de Ensino</h1>
+                        {loading && <span style={{ fontSize: '0.8rem', marginLeft: '10px' }}>(Carregando...)</span>}
                     </CardTitle>
                     <CardTitle>
                         <input
@@ -86,12 +107,29 @@ const Instituicoes: React.FC = () => {
             </DefaultContainer>
 
                 <DashboardContainer>
-                    {filteredInstitutions.map((institution) => (
+                    {loading && (
+                        <div style={{ padding: '2rem', textAlign: 'center', width: '100%' }}>
+                            Carregando instituições...
+                        </div>
+                    )}
+
+                    {error && (
+                        <div style={{ padding: '2rem', textAlign: 'center', width: '100%', color: 'red' }}>
+                            {error}
+                            <div style={{ marginTop: '1rem' }}>
+                                <ButtonStyled onClick={() => window.location.reload()}>
+                                    Tentar novamente
+                                </ButtonStyled>
+                            </div>
+                        </div>
+                    )}
+
+                    {!loading && !error && filteredInstitutions.map((institution) => (
                         <StatsGrid key={institution.id}>
                             <Card style={{ marginBottom: '1rem' }}>
                                 <StatContent>
                                     <StatValue>{institution.nome}</StatValue>
-                                    <StatLabel>{institution.municipio.nome}-{institution.municipio.uf}</StatLabel>
+                                    <StatLabel>{institution.municipio.nome} - {institution.municipio.unidadeFederativa.sigla}</StatLabel>
                                     <StatLabel>Tipo: {institution.tipoInstituicaoEnsino}</StatLabel>
                                     <StatLabel>Alunos: {institution.totalAlunos}</StatLabel>
                                     <StatLabel>
@@ -122,8 +160,10 @@ const Instituicoes: React.FC = () => {
                             </Card>
                         </StatsGrid>
                     ))}
-                    {filteredInstitutions.length === 0 && (
-                        <div>Nenhuma instituição encontrada.</div>
+                    {!loading && !error && filteredInstitutions.length === 0 && (
+                        <div style={{ padding: '2rem', textAlign: 'center', width: '100%' }}>
+                            Nenhuma instituição encontrada.
+                        </div>
                     )}
                 </DashboardContainer>
         </>

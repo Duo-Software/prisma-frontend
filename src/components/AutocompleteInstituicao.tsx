@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { InputPadrao } from './layout/InputPadrao.tsx';
-import { mockInstitutions } from '../mocks/instituicoes-mock.ts';
+import { buscarInstituicoesPorNome, type Instituicao } from '../services/instituicaoService.ts';
 import styled from 'styled-components';
 
 const SugestoesList = styled.ul`
@@ -32,15 +32,6 @@ const SugestaoItem = styled.li`
   }
 `;
 
-interface Instituicao {
-  id: number;
-  nome: string;
-  municipio: {
-    nome: string;
-    uf: string;
-  };
-}
-
 interface AutocompleteInstituicaoProps {
   name: string;
   value: string;
@@ -64,24 +55,30 @@ export const AutocompleteInstituicao: React.FC<AutocompleteInstituicaoProps> = (
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
 
-  // Função para filtrar instituições
-  const filtrarInstituicoes = (query: string) => {
-    const lowerQuery = query.toLowerCase();
-    return mockInstitutions.filter(instituicao =>
-      instituicao.nome.toLowerCase().includes(lowerQuery)
-    );
-  };
-
   // Atualiza sugestões quando o valor do input muda
   useEffect(() => {
-    if (value.length >= 2) {
-      const sugestoesFiltradas = filtrarInstituicoes(value);
-      setSugestoes(sugestoesFiltradas.slice(0, 10)); // Limita a 10 sugestões
-      setMostrarSugestoes(true);
-    } else {
-      setSugestoes([]);
-      setMostrarSugestoes(false);
-    }
+    const buscarSugestoes = async () => {
+      if (value.length >= 2) {
+        try {
+          const instituicoes = await buscarInstituicoesPorNome(value);
+          setSugestoes(instituicoes.slice(0, 10)); // Limita a 10 sugestões
+          setMostrarSugestoes(true);
+        } catch (error) {
+          console.error('Erro ao buscar sugestões de instituições:', error);
+          setSugestoes([]);
+        }
+      } else {
+        setSugestoes([]);
+        setMostrarSugestoes(false);
+      }
+    };
+
+    // Usar um debounce para evitar muitas chamadas à API
+    const timeoutId = setTimeout(() => {
+      buscarSugestoes();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [value]);
 
   // Fecha sugestões quando clica fora
