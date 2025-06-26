@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     DashboardContainer,
@@ -12,18 +12,35 @@ import {
     StatChange,
     FixedHeader, ButtonStyled, ButtonCardStyled
 } from "../../components/layout/DefaultComponents.tsx";
-import { mockAlunos } from "../../mocks/alunos-mock.ts";
 import { useSidebar } from "../../context/SidebarContext.tsx";
 import { useTheme } from "styled-components";
 import { FiEdit, FiPlus } from "react-icons/fi";
 import { StatusAluno } from "../../mocks/status-aluno.ts";
+import { listarTodos } from "../../services/alunoService";
+import type {Aluno} from "../../types/aluno.ts";
 
 const Alunos: React.FC = () => {
     const [search, setSearch] = useState("");
-    const [alunos] = useState(mockAlunos);
+    const [alunos, setAlunos] = useState<Aluno[]>([]);
+    const [loading, setLoading] = useState(true);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchAlunos = async () => {
+            try {
+                const data = await listarTodos();
+                setAlunos(data);
+            } catch (error) {
+                console.error('Erro ao carregar alunos:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAlunos();
+    }, []);
 
     // Filtrar alunos conforme busca, só aplica filtro com mais de 3 caracteres
     const filteredAlunos = useMemo(() => {
@@ -112,7 +129,11 @@ const Alunos: React.FC = () => {
             </DefaultContainer>
 
             <DashboardContainer>
-                {filteredAlunos.map((aluno) => {
+                {loading && <div>Carregando alunos...</div>}
+                {!loading && filteredAlunos.length === 0 && (
+                    <div>Nenhum aluno encontrado.</div>
+                )}
+                {!loading && filteredAlunos.map((aluno) => {
                     const statusInfo = formatarStatus(aluno.status);
 
                     return (
@@ -156,9 +177,6 @@ const Alunos: React.FC = () => {
                         </StatsGrid>
                     );
                 })}
-                {filteredAlunos.length === 0 && (
-                    <div>Nenhum aluno encontrado.</div>
-                )}
             </DashboardContainer>
         </>
     );

@@ -1,30 +1,24 @@
-import type {Aluno} from "../types/aluno";
-import { mockAlunos } from "../mocks/alunos-mock";
+import type { Aluno } from "../types/aluno";
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:8080/api';
 
 // Função para buscar aluno pelo CPF da pessoa
 export const buscarAlunoPorCpf = async (cpf: string): Promise<{ encontrado: boolean; aluno?: Aluno }> => {
-  // Remove caracteres não numéricos do CPF para comparação
-  const cpfLimpo = cpf.replace(/\D/g, '');
-
-  // Simulação de busca no backend
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const alunoEncontrado = mockAlunos.find(aluno => 
-        aluno?.pessoa?.cpf?.replace(/\D/g, '') === cpfLimpo
-      );
-
-      if (alunoEncontrado) {
-        resolve({
-          encontrado: true,
-          aluno: alunoEncontrado
-        });
-      } else {
-        resolve({
-          encontrado: false
-        });
-      }
-    }, 500); // Simulação de delay de rede
-  });
+  try {
+    const response = await axios.get(`${BASE_URL}/alunos/cpf/${cpf}`);
+    return {
+      encontrado: true,
+      aluno: response.data
+    };
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return {
+        encontrado: false
+      };
+    }
+    throw error;
+  }
 };
 
 // Função para formatar CPF com máscara
@@ -48,31 +42,23 @@ export const formatarCpf = (cpf: string): string => {
 
 // Função para criar ou atualizar aluno
 export const salvarAluno = async (aluno: Aluno): Promise<Aluno> => {
-  // Simulação de salvamento no backend
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Se já existe ID, seria um update
-      if (aluno.id) {
-        const index = mockAlunos.findIndex(a => a.id === aluno.id);
-        if (index >= 0) {
-          mockAlunos[index] = {
-            ...aluno,
-            dataAlteracao: new Date().toISOString()
-          };
-          resolve(mockAlunos[index]);
-        }
-      }
+  if (aluno.id) {
+    // Atualização
+    const response = await axios.put(`${BASE_URL}/alunos/${aluno.id}`, aluno);
+    return response.data;
+  } else {
+    // Criação
+    const response = await axios.post(`${BASE_URL}/alunos`, {
+      ...aluno,
+      dataCadastro: new Date().toISOString(),
+      dataAlteracao: new Date().toISOString()
+    });
+    return response.data;
+  }
+};
 
-      // Caso contrário, seria uma inserção
-      const novoAluno: Aluno = {
-        ...aluno,
-        id: Math.max(...mockAlunos.map(a => Number(a.id))) + 1,
-        dataCadastro: aluno.dataCadastro || new Date().toISOString(),
-        dataAlteracao: new Date().toISOString()
-      };
-
-      mockAlunos.push(novoAluno);
-      resolve(novoAluno);
-    }, 800); // Simulação de delay de rede
-  });
+// Função para listar todos os alunos
+export const listarTodos = async (): Promise<Aluno[]> => {
+  const response = await axios.get(`${BASE_URL}/alunos`);
+  return response.data;
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     DashboardContainer,
@@ -12,17 +12,33 @@ import {
     StatChange,
     FixedHeader, ButtonStyled, ButtonCardStyled
 } from "../../components/layout/DefaultComponents.tsx";
-import { mockProfissionais } from "../../mocks/profissionais-mock.ts";
-import {useSidebar} from "../../context/SidebarContext.tsx";
-import {useTheme} from "styled-components";
-import {FiEdit, FiPlus} from "react-icons/fi";
+import { useSidebar } from "../../context/SidebarContext.tsx";
+import { useTheme } from "styled-components";
+import { FiEdit, FiPlus } from "react-icons/fi";
+import { profissionalService } from "../../services/profissionalService";
 
 const Profissionais: React.FC = () => {
     const [search, setSearch] = useState("");
-    const [profissionais] = useState(mockProfissionais);
+    const [profissionais, setProfissionais] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchProfissionais = async () => {
+            try {
+                const data = await profissionalService.listarProfissionais();
+                setProfissionais(data);
+            } catch (error) {
+                console.error('Erro ao carregar profissionais:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfissionais();
+    }, []);
 
     // Filtrar profissionais conforme busca, só aplica filtro com mais de 3 caracteres
     const filteredProfissionais = useMemo(() => {
@@ -60,7 +76,7 @@ const Profissionais: React.FC = () => {
                             placeholder="Digite para buscar..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            style={{minWidth: 320, padding: 8, fontSize: 16}}
+                            style={{ minWidth: 320, padding: 8, fontSize: 16 }}
                         />
                     </CardTitle>
 
@@ -82,6 +98,10 @@ const Profissionais: React.FC = () => {
             </DefaultContainer>
 
             <DashboardContainer>
+                {loading && <div>Carregando profissionais...</div>}
+                {!loading && filteredProfissionais.length === 0 && (
+                    <div>Nenhum profissional encontrado.</div>
+                )}
                 {filteredProfissionais.map((profissional) => (
                     <StatsGrid key={profissional.id}>
                         <Card style={{ marginBottom: '1rem' }}>
@@ -99,7 +119,7 @@ const Profissionais: React.FC = () => {
                                 </StatLabel>
                             </StatContent>
                             <ButtonCardStyled
-                                onClick={() => navigate("/profissionais/cadastro-profissional", {state: profissional})}
+                                onClick={() => navigate("/profissionais/cadastro-profissional", { state: profissional })}
                                 title="Editar profissional"
                                 style={{
                                     display: "flex",
@@ -119,9 +139,6 @@ const Profissionais: React.FC = () => {
                         </Card>
                     </StatsGrid>
                 ))}
-                {filteredProfissionais.length === 0 && (
-                    <div>Nenhum profissional encontrado.</div>
-                )}
             </DashboardContainer>
         </>
     );
