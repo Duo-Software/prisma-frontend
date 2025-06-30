@@ -3,6 +3,7 @@ import { StatusAluno } from "../mocks/status-aluno";
 
 export interface Aluno {
   id: number;
+  matricula?: string;
   pessoa: Pessoa;
   instituicaoEnsino: {
     id: number | string;
@@ -28,7 +29,7 @@ export interface Aluno {
   };
   status: StatusAluno;
   dataIngresso: string;
-  dataEgresso: string | null;
+  dataEgresso?: string;
   dataCadastro: string;
   dataAlteracao: string;
 }

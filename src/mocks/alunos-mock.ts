@@ -48,7 +48,8 @@ export const mockAlunos: Aluno[] = [
     dataIngresso: "2022-02-01T08:00:00",
     dataEgresso: null,
     dataCadastro: "2022-01-10T14:25:00",
-    dataAlteracao: "2022-01-15T09:30:00"
+    dataAlteracao: "2022-01-15T09:30:00",
+    matricula: '2022000001'
   },
   {
     id: 2,
@@ -96,7 +97,8 @@ export const mockAlunos: Aluno[] = [
     dataIngresso: "2022-02-01T08:00:00",
     dataEgresso: null,
     dataCadastro: "2022-01-12T11:30:00",
-    dataAlteracao: "2022-01-18T14:20:00"
+    dataAlteracao: "2022-01-18T14:20:00",
+    matricula: '2022000002'
   },
   {
     id: 3,
@@ -144,7 +146,8 @@ export const mockAlunos: Aluno[] = [
     dataIngresso: "2022-02-01T08:00:00",
     dataEgresso: null,
     dataCadastro: "2022-01-14T16:40:00",
-    dataAlteracao: "2022-03-22T10:15:00"
+    dataAlteracao: "2022-03-22T10:15:00",
+    matricula: '2022000003'
   },
   {
     id: 4,
@@ -192,7 +195,8 @@ export const mockAlunos: Aluno[] = [
     dataIngresso: "2022-02-01T08:00:00",
     dataEgresso: null,
     dataCadastro: "2022-01-18T09:30:00",
-    dataAlteracao: "2022-01-20T14:10:00"
+    dataAlteracao: "2022-01-20T14:10:00",
+    matricula: '2022000004'
   },
   {
     id: 5,
@@ -240,6 +244,7 @@ export const mockAlunos: Aluno[] = [
     dataIngresso: "2021-02-01T08:00:00",
     dataEgresso: "2023-12-20T10:00:00",
     dataCadastro: "2021-01-10T11:25:00",
-    dataAlteracao: "2023-12-20T10:00:00"
+    dataAlteracao: "2023-12-20T10:00:00",
+    matricula: '2021000005'
   }
 ];

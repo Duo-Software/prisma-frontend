@@ -84,19 +84,21 @@ export const Dashboard: React.FC = () => {
             </StatsGrid>
 
             <StatsGrid>
-                <Card style={{ minHeight: 240 }}>
-                    <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
-                        <FiFileMinus color="#0ea5e9"/>
-                    </StatIconWrapper>
-                    <StatContent>
-                        <StatValue>432</StatValue>
-                        <StatLabel>Relatórios</StatLabel>
-                    </StatContent>
-                    <StatFooter>
-                        <StatChange $isPositive={false}>-3.1%</StatChange>
-                        <StatPeriod>desde o mês passado</StatPeriod>
-                    </StatFooter>
-                </Card>
+                <Link to="/relatorios" style={{textDecoration: "none"}}>
+                    <Card style={{minHeight: 240}}>
+                        <StatIconWrapper $bgColor="rgba(14, 165, 233, 0.15)">
+                            <FiFileMinus color="#0ea5e9"/>
+                        </StatIconWrapper>
+                        <StatContent>
+                            <StatValue>432</StatValue>
+                            <StatLabel>Relatórios</StatLabel>
+                        </StatContent>
+                        <StatFooter>
+                            <StatChange $isPositive={false}>-3.1%</StatChange>
+                            <StatPeriod>desde o mês passado</StatPeriod>
+                        </StatFooter>
+                    </Card>
+                </Link>
             </StatsGrid>
         </DashboardContainer>
     );
