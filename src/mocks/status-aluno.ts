@@ -1,3 +1,4 @@
+// @ts-ignore
 export enum StatusAluno {
   MATRICULADO = "MATRICULADO",
   TRANCADO = "TRANCADO",

@@ -15,11 +15,11 @@ import {
 import { useSidebar } from "../../context/SidebarContext.tsx";
 import { useTheme } from "styled-components";
 import { FiEdit, FiPlus } from "react-icons/fi";
-import { profissionalService } from "../../services/profissionalService";
+import {type Profissional, profissionalService} from "../../services/profissionalService";
 
 const Profissionais: React.FC = () => {
     const [search, setSearch] = useState("");
-    const [profissionais, setProfissionais] = useState([]);
+    const [profissionais, setProfissionais] = useState<Profissional[]>([]);
     const [loading, setLoading] = useState(true);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();

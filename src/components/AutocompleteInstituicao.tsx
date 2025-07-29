@@ -133,7 +133,7 @@ export const AutocompleteInstituicao: React.FC<AutocompleteInstituicaoProps> = (
               key={`${instituicao.id}-${index}`}
               onClick={() => selecionarInstituicao(instituicao)}
             >
-              {instituicao.nome} - {instituicao.municipio.nome}/{instituicao.municipio.uf}
+              {instituicao.nome} - {instituicao.municipio.nome}/{instituicao.municipio.unidadeFederativa.sigla}
             </SugestaoItem>
           ))}
         </SugestoesList>

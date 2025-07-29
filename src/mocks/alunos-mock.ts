@@ -46,7 +46,7 @@ export const mockAlunos: Aluno[] = [
     },
     status: StatusAluno.MATRICULADO,
     dataIngresso: "2022-02-01T08:00:00",
-    dataEgresso: null,
+    dataEgresso: undefined,
     dataCadastro: "2022-01-10T14:25:00",
     dataAlteracao: "2022-01-15T09:30:00",
     matricula: '2022000001'
@@ -95,7 +95,7 @@ export const mockAlunos: Aluno[] = [
     },
     status: StatusAluno.MATRICULADO,
     dataIngresso: "2022-02-01T08:00:00",
-    dataEgresso: null,
+    dataEgresso: undefined,
     dataCadastro: "2022-01-12T11:30:00",
     dataAlteracao: "2022-01-18T14:20:00",
     matricula: '2022000002'
@@ -144,7 +144,7 @@ export const mockAlunos: Aluno[] = [
     },
     status: StatusAluno.TRANCADO,
     dataIngresso: "2022-02-01T08:00:00",
-    dataEgresso: null,
+    dataEgresso: undefined,
     dataCadastro: "2022-01-14T16:40:00",
     dataAlteracao: "2022-03-22T10:15:00",
     matricula: '2022000003'
@@ -193,7 +193,7 @@ export const mockAlunos: Aluno[] = [
     },
     status: StatusAluno.MATRICULADO,
     dataIngresso: "2022-02-01T08:00:00",
-    dataEgresso: null,
+    dataEgresso: undefined,
     dataCadastro: "2022-01-18T09:30:00",
     dataAlteracao: "2022-01-20T14:10:00",
     matricula: '2022000004'

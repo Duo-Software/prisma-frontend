@@ -81,11 +81,11 @@ const RelatorioAlunosPdf: React.FC = () => {
               <tr key={aluno.matricula}>
                 <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{idx + 1}</td>
                 <td style={{ border: '1px solid #ccc', padding: 6 }}>{aluno.pessoa.nome}</td>
-                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{new Date(aluno.pessoa.dataNascimento).toLocaleDateString('pt-BR')}</td>
+                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{aluno.pessoa.dataNascimento ? new Date(aluno.pessoa.dataNascimento).toLocaleDateString('pt-BR') : '-'}</td>
                 <td style={{ border: '1px solid #ccc', padding: 6 }}>{aluno.pessoa.cpf}</td>
                 <td style={{ border: '1px solid #ccc', padding: 6 }}>{aluno.matricula}</td>
-                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{new Date(aluno.dataIngresso).toLocaleDateString('pt-BR')}</td>
-                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{new Date(aluno?.dataEgresso).toLocaleDateString('pt-BR')}</td>
+                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{aluno.dataIngresso ? new Date(aluno.dataIngresso).toLocaleDateString('pt-BR') : '-'}</td>
+                <td style={{ border: '1px solid #ccc', padding: 6, textAlign: 'center' }}>{aluno.dataEgresso ? new Date(aluno.dataEgresso).toLocaleDateString('pt-BR') : '-'}</td>
                 <td style={{ border: '1px solid #ccc', padding: 6 }}>{aluno.status}</td>
               </tr>
             ))}

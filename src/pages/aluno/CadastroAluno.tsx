@@ -70,7 +70,7 @@ const initialFormState = {
     pessoa: initialPessoaState,
     instituicaoNome: "",
     instituicaoId: "",
-    status: "",
+    status: StatusAluno.MATRICULADO,
     dataIngresso: "",
     dataEgresso: ""
 };
@@ -121,7 +121,7 @@ const CadastroAluno: React.FC = () => {
                     dataAlteracao: pessoaData.dataAlteracao || ""
                 },
                 instituicaoNome: alunoData.instituicaoEnsino?.nome || "",
-                instituicaoId: alunoData.instituicaoEnsino?.id || "",
+                instituicaoId: alunoData.instituicaoEnsino?.id?.toString() || "",
                 status: alunoData.status || "",
                 dataIngresso: alunoData.dataIngresso ? alunoData.dataIngresso.split('T')[0] : "",
                 dataEgresso: alunoData.dataEgresso ? alunoData.dataEgresso.split('T')[0] : ""
@@ -158,7 +158,7 @@ const CadastroAluno: React.FC = () => {
                         id: alunoEncontrado.id,
                         pessoa: alunoEncontrado.pessoa,
                         instituicaoNome: alunoEncontrado.instituicaoEnsino.nome,
-                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id : 0,
+                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id.toString() : "",
                         status: alunoEncontrado.status,
                         dataIngresso: alunoEncontrado.dataIngresso.split('T')[0],
                         dataEgresso: alunoEncontrado.dataEgresso ? alunoEncontrado.dataEgresso.split('T')[0] : ""
@@ -279,7 +279,7 @@ const CadastroAluno: React.FC = () => {
             },
             status: form.status as StatusAluno,
             dataIngresso: new Date(form.dataIngresso).toISOString(),
-            dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : null,
+            dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
             dataCadastro: "", // Será preenchido pelo backend
             dataAlteracao: "" // Será preenchido pelo backend
         };
