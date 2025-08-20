@@ -33,3 +33,10 @@ export interface Aluno {
   dataCadastro: string;
   dataAlteracao: string;
 }
+
+export interface AlunoFilter {
+    pessoaNome?: string;
+    cpf?: number;
+    instituicaoEnsino?: number;
+    status?: StatusAluno;
+}

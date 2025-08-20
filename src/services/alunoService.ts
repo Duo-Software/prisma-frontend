@@ -1,4 +1,4 @@
-import type { Aluno } from "../types/aluno";
+import type {Aluno, AlunoFilter} from "../types/aluno";
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080/api';
@@ -60,5 +60,14 @@ export const salvarAluno = async (aluno: Aluno): Promise<Aluno> => {
 // Função para listar todos os alunos
 export const listarTodos = async (): Promise<Aluno[]> => {
   const response = await axios.get(`${BASE_URL}/alunos`);
+  return response.data;
+};
+
+export const listarByFilter = async (instituicaoId: number): Promise<Aluno[]> => {
+  const alunoFilter: AlunoFilter = {
+    instituicaoEnsino: instituicaoId,
+    status: undefined
+  };
+  const response = await axios.post(`${BASE_URL}/alunos/filter`, alunoFilter);
   return response.data;
 };

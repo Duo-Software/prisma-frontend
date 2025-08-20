@@ -24,17 +24,17 @@ export const DefaultContainer = styled.div`
     padding: 1rem 0;
 `;
 
-export const LoginContainer = styled.div<{ $isSidebarOpen?: boolean }>`
+export const LoginContainer = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     top: ${props => props.theme.sizes.headerHeight};
-    left: ${props => props.$isSidebarOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed};
+    left: ${props => props.theme.sizes.sidebarWidthCollapsed};
     right: 0;
     bottom: 0;
-    width: calc(100vw - ${props => props.$isSidebarOpen ? props.theme.sizes.sidebarWidth : props.theme.sizes.sidebarWidthCollapsed});
+    width: calc(100vw - ${props => props.theme.sizes.sidebarWidthCollapsed});
     height: calc(100vh - ${props => props.theme.sizes.headerHeight});
     margin: 0;
     padding: 0;

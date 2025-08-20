@@ -5,29 +5,34 @@ import {
     StatLabel,
     FixedHeader,
     ButtonStyled,
-    CardTitle, LoginContainer,
+    CardTitle,
+    LoginContainer,
 } from "../../components/layout/DefaultComponents.tsx";
-import { useSidebar } from "../../context/SidebarContext.tsx";
-import { useTheme } from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const Login: React.FC = () => {
-    const [usuario, setUsuario] = useState("");
+    const [username, setUsername] = useState("");
     const [senha, setSenha] = useState("");
-    const { isSidebarOpen } = useSidebar();
-    const theme = useTheme();
-    const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const { login, isLoading } = useAuth();
+    const { theme } = useTheme();
 
-    const handleLogin = () => {
-        // Simula login e redireciona para o dashboard
-        navigate("/");
+    const handleLogin = async () => {
+        try {
+            setError("");
+            await login(username, senha);
+        } catch (err) {
+            setError("Credenciais inválidas. Por favor, tente novamente.");
+            console.error("Erro no login:", err);
+        }
     };
 
     return (
         <>
-            <LoginContainer $isSidebarOpen={isSidebarOpen}>
+            <LoginContainer>
                 <FixedHeader
-                    $isSidebarOpen={isSidebarOpen}
+                    $isSidebarOpen={false}
                     $sidebarWidth={theme.sizes.sidebarWidth}
                     $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
                 >
@@ -55,11 +60,17 @@ const Login: React.FC = () => {
                         <StatContent>
                             <h2 style={{ marginBottom: 8 }}>Login</h2>
 
+                            {error && (
+                                <div style={{ color: "red", marginBottom: 16 }}>
+                                    {error}
+                                </div>
+                            )}
+
                             <StatLabel>Usuário</StatLabel>
                             <input
                                 type="text"
-                                value={usuario}
-                                onChange={(e) => setUsuario(e.target.value)}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 style={{
                                     padding: 10,
                                     fontSize: 16,
@@ -83,9 +94,10 @@ const Login: React.FC = () => {
 
                             <ButtonStyled
                                 onClick={handleLogin}
+                                disabled={isLoading}
                                 style={{ marginTop: 16, padding: 12, fontSize: 16 }}
                             >
-                                Entrar
+                                {isLoading ? "Entrando..." : "Entrar"}
                             </ButtonStyled>
                         </StatContent>
                     </Card>

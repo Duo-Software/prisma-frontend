@@ -13,9 +13,10 @@ import {useTheme} from "styled-components";
 import {InputPadrao} from "../../components/layout/InputPadrao.tsx";
 import {AutocompleteMunicipio} from "../../components/AutocompleteMunicipio.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
+import type {Instituicao} from "../../services/instituicaoService.ts";
 
 const initialFormState = {
-    id: "",
+    id: 0,
     nome: "",
     municipioNome: "",
     municipioUF: "",
@@ -37,14 +38,14 @@ const CadastroInstituicao: React.FC = () => {
     useEffect(() => {
         // Verifica se há uma instituição sendo passada pelo state da rota
         if (location.state) {
-            const institutionData = location.state;
+            const institutionData: Instituicao = location.state;
 
             // Preencher o formulário com os dados da instituição
             setForm({
-                id: institutionData.id || "",
+                id: institutionData.id,
                 nome: institutionData.nome || "",
                 municipioNome: institutionData.municipio?.nome || "",
-                municipioUF: institutionData.municipio?.uf || "",
+                municipioUF: institutionData.municipio?.unidadeFederativa.sigla || "",
                 tipoInstituicaoEnsino: institutionData.tipoInstituicaoEnsino || "",
                 totalAlunos: institutionData.totalAlunos?.toString() || "",
                 ativo: institutionData.ativo !== undefined ? institutionData.ativo : true

@@ -18,8 +18,7 @@ const Sidebar: React.FC = () => {
         { path: '/instituicoes', label: 'Instituições', icon: <FiBookOpen /> },
         { path: '/profissionais', label: 'Profissionais', icon: <FiUsers /> },
         { path: '/alunos', label: 'Alunos', icon: <FiUsers /> },
-        { path: '/calendar', label: 'Calendário', icon: <FiCalendar /> },
-        { path: '/data', label: 'Dados', icon: <FiDatabase /> },
+        { path: '/formularios', label: 'Formulários', icon: <FiDatabase /> },
         { path: '/profile', label: 'Perfil', icon: <FiUser /> },
         { path: '/settings', label: 'Configurações', icon: <FiSettings /> },
     ];
