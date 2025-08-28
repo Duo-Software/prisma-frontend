@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import type {Formulario, Pergunta, Resposta} from "../../types/formulario.ts";
-import {buscarFormularioPorId} from "../../services/formularioService.ts";
+import type {Avaliacao, Pergunta, Resposta} from "../../types/formulario.ts";
 import './ResponderFormulario.css';
-import {criarAvaliacao} from "../../services/avaliacaoService.ts";
+import {buscarAvaliacaoPorId, criarAvaliacao} from "../../services/avaliacaoService.ts";
 
 
 const ResponderFormulario: React.FC = () => {
-  const { idFormulario, idAluno } = useParams<{ idFormulario: string, idAluno: string }>();
-  const [formulario, setFormulario] = useState<Formulario | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const [avaliacao, setAvaliacao] = useState<Avaliacao | null>(null);
   const [respostas, setRespostas] = useState<Record<number, Resposta>>({});
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -19,9 +18,9 @@ const ResponderFormulario: React.FC = () => {
     const carregarFormulario = async () => {
       try {
         //convertendo para number
-        const idForm = Number(idFormulario);
-        const dadosFormulario = await buscarFormularioPorId(idForm);
-        setFormulario(dadosFormulario);
+        const idForm = Number(id);
+        const dadosAvaliacao = await buscarAvaliacaoPorId(idForm);
+        setAvaliacao(dadosAvaliacao);
       } catch (error) {
         // Tratamento de erro adequado pode ser adicionado aqui
       } finally {
@@ -30,7 +29,7 @@ const ResponderFormulario: React.FC = () => {
     };
 
     carregarFormulario();
-  }, [idFormulario]);
+  }, [id]);
 
 
 
@@ -48,14 +47,11 @@ const ResponderFormulario: React.FC = () => {
 
   const validateForm = () => {
     let valid = true;
-    if (!formulario) return false;
-    formulario.categorias.forEach(categoria => {
-      categoria.perguntas.filter(p => p.ativo).forEach(pergunta => {
-        const resposta = respostas[pergunta.id];
+    if (!avaliacao) return false;
+    avaliacao.respostas.filter(r => r.pergunta.ativo).forEach(resposta => {
         if (!resposta) valid = false;
-        if (pergunta.tipoResposta === 'ESCOLHA_UNICA' && (!resposta?.alternativaIds.length)) valid = false;
-        if (pergunta.tipoResposta === 'DISSERTATIVA' && !resposta?.respostaTexto?.trim()) valid = false;
-      });
+        if (resposta.resposta === 'ESCOLHA_UNICA' && (!resposta?.alternativas.length)) valid = false;
+        if (resposta.resposta === 'DISSERTATIVA' && !resposta?.respostaTexto?.trim()) valid = false;
     });
     return valid;
   };
@@ -69,8 +65,8 @@ const ResponderFormulario: React.FC = () => {
     }
     // Exemplo fixo de alunoId e profissionalAvaliadorId
     const payload = {
-      alunoId: Number(idAluno),
-      profissionalAvaliadorId: 10000,
+      alunoId: avaliacao?.aluno.id,
+      profissionalAvaliadorId: avaliacao?.profissionalAvaliador.id,
       dataCadastro: new Date().toISOString().slice(0, 10),
       respostas: Object.values(respostas),
       ativo: true,
@@ -84,40 +80,39 @@ const ResponderFormulario: React.FC = () => {
   };
 
   if (loading) return <div>Carregando...</div>;
-  if (!formulario) return <div>Formulário não encontrado.</div>;
-  if (success) {
+  if (!avaliacao) return <div>Formulário não encontrado.</div>;
+  if (avaliacao?.id > 0) {
     return (
       <div className="formulario-container">
-        <h2 className="formulario-titulo">{formulario.nomeFormulario}</h2>
+        <h2 className="formulario-titulo">{avaliacao.formulario}</h2>
         <div className="formulario-header">
           <div className="formulario-dados-header">
-            <div><b>Aluno:</b> Laura Cristina Moreira</div>
-            <div><b>Instituição de Ensino:</b> Colégio Estadual São Jorge</div>
-            <div><b>Profissional Avaliador:</b> Jose Mario Gutierres</div>
-            <div><b>Data da Avaliação:</b> {new Date().toLocaleString('pt-BR')}</div>
+            <div><b>Aluno:</b> {avaliacao.aluno.pessoa.nome}</div>
+            <div><b>Instituição de Ensino:</b> {avaliacao.aluno.instituicaoEnsino.nome}</div>
+            <div><b>Profissional Avaliador:</b> {avaliacao.profissionalAvaliador.pessoa.nome}</div>
+            <div><b>Data da Avaliação:</b> {avaliacao.dataCadastro}</div>
           </div>
         </div>
         <div><br /><br /></div>
         <form className="formulario-avaliacao" style={{ pointerEvents: 'none', opacity: 0.95 }}>
-          {formulario.categorias?.map(categoria => (
-            <section key={categoria.id} className="categoria-section">
-              <h3 className="categoria-titulo">{categoria.nome}</h3>
-              {categoria.perguntas.filter(p => p.ativo).map(pergunta => (
-                <div key={pergunta.id} className="pergunta-box">
-                  {pergunta.tipoResposta === 'ESCOLHA_UNICA' ? (
+          {avaliacao.respostas?.map(resposta => (
+            <section key={resposta.categoria.id} className="categoria-section">
+              <h3 className="categoria-titulo">{resposta.categoria.nome}</h3>
+                <div key={resposta.pergunta.id} className="pergunta-box">
+                  {resposta.pergunta.tipoResposta === 'ESCOLHA_UNICA' ? (
                     <fieldset className="pergunta-fieldset">
                       <legend className="pergunta-legend">
-                        <label htmlFor={`pergunta_${pergunta.id}`}><b>{pergunta.texto}</b> <span className="obrigatorio">*</span></label>
+                        <label htmlFor={`pergunta_${resposta.pergunta.id}`}><b>{resposta.pergunta.texto}</b></label>
                       </legend>
                       <div className="alternativas-group">
-                        {pergunta.alternativas.filter(a => a.ativo).map(alt => (
+                        {resposta.alternativas.filter(a => a.ativo).map(alt => (
                           <label key={alt.id} className="alternativa-label">
                             <input
                               type="radio"
                               id={`alt_${alt.id}`}
-                              name={`pergunta_${pergunta.id}`}
+                              name={`pergunta_${resposta.pergunta.id}`}
                               value={alt.id}
-                              checked={respostas[pergunta.id]?.alternativaIds[0] === alt.id}
+                              checked={true}
                               readOnly
                               disabled
                             />
@@ -128,25 +123,23 @@ const ResponderFormulario: React.FC = () => {
                     </fieldset>
                   ) : (
                     <div className="pergunta-dissertativa">
-                      <label htmlFor={`pergunta_${pergunta.id}`} className="pergunta-label">
-                        <b>{pergunta.texto}</b> <span className="obrigatorio">*</span>
+                      <label htmlFor={`pergunta_${resposta.pergunta.id}`} className="pergunta-label">
+                        <b>{resposta.pergunta.texto}</b>
                       </label>
                       <textarea
-                        id={`pergunta_${pergunta.id}`}
+                        id={`pergunta_${resposta.pergunta.id}`}
                         className="textarea-dissertativa"
                         style={{ width: '100%', minHeight: 60 }}
-                        value={respostas[pergunta.id]?.respostaTexto || ''}
+                        value={respostas[resposta.pergunta.id]?.respostaTexto || ''}
                         readOnly
                         disabled
                       />
                     </div>
                   )}
                 </div>
-              ))}
-            </section>
+              </section>
           ))}
         </form>
-        <div className="mensagem-sucesso" role="status">Formulário enviado com sucesso!</div>
         <button type="button" className="botao-enviar" onClick={() => navigate(-1)} aria-label="Voltar">Voltar</button>
       </div>
     );
@@ -154,28 +147,27 @@ const ResponderFormulario: React.FC = () => {
 
   return (
     <div className="formulario-container">
-      <h2 className="formulario-titulo">{formulario.nomeFormulario}</h2>
+      <h2 className="formulario-titulo">{avaliacao.formulario}</h2>
       <form className="formulario-avaliacao" onSubmit={handleSubmit} noValidate>
-        {formulario.categorias?.map(categoria => (
-          <section key={categoria.id} className="categoria-section">
-            <h3 className="categoria-titulo">{categoria.nome}</h3>
-            {categoria.perguntas.filter(p => p.ativo).map(pergunta => (
-              <div key={pergunta.id} className="pergunta-box">
-                {pergunta.tipoResposta === 'ESCOLHA_UNICA' ? (
+        {avaliacao.respostas?.map(resposta => (
+          <section key={resposta.categoria.id} className="categoria-section">
+            <h3 className="categoria-titulo">{resposta.categoria.nome}</h3>
+              <div key={resposta.pergunta.id} className="pergunta-box">
+                {resposta.pergunta.tipoResposta === 'ESCOLHA_UNICA' ? (
                   <fieldset className="pergunta-fieldset">
                     <legend className="pergunta-legend">
-                      <label htmlFor={`pergunta_${pergunta.id}`}><b>{pergunta.texto}</b> <span className="obrigatorio">*</span></label>
+                      <label htmlFor={`pergunta_${resposta.pergunta.id}`}><b>{resposta.pergunta.texto}</b></label>
                     </legend>
                     <div className="alternativas-group">
-                      {pergunta.alternativas.filter(a => a.ativo).map(alt => (
+                      {resposta.alternativas.filter(a => a.ativo).map(alt => (
                         <label key={alt.id} className="alternativa-label">
                           <input
                             type="radio"
                             id={`alt_${alt.id}`}
-                            name={`pergunta_${pergunta.id}`}
+                            name={`pergunta_${resposta.pergunta.id}`}
                             value={alt.id}
-                            checked={respostas[pergunta.id]?.alternativaIds[0] === alt.id}
-                            onChange={() => handleChange(pergunta, alt.id)}
+                            checked={respostas[resposta.pergunta.id]?.alternativaIds[0] === alt.id}
+                            onChange={() => handleChange(resposta.pergunta, alt.id)}
                             required
                             aria-required="true"
                           />
@@ -186,23 +178,22 @@ const ResponderFormulario: React.FC = () => {
                   </fieldset>
                 ) : (
                   <div className="pergunta-dissertativa">
-                    <label htmlFor={`pergunta_${pergunta.id}`} className="pergunta-label">
-                      <b>{pergunta.texto}</b> <span className="obrigatorio">*</span>
+                    <label htmlFor={`pergunta_${resposta.pergunta.id}`} className="pergunta-label">
+                      <b>{resposta.pergunta.texto}</b>
                     </label>
                     <textarea
-                      id={`pergunta_${pergunta.id}`}
+                      id={`pergunta_${resposta.pergunta.id}`}
                       className="textarea-dissertativa"
                       style={{ width: '100%', minHeight: 60 }}
-                      value={respostas[pergunta.id]?.respostaTexto || ''}
-                      onChange={e => handleChange(pergunta, e.target.value)}
+                      value={respostas[resposta.pergunta.id]?.respostaTexto || ''}
+                      onChange={e => handleChange(resposta.pergunta, e.target.value)}
                       required
                       aria-required="true"
-                      aria-label={pergunta.texto}
+                      aria-label={resposta.pergunta.texto}
                     />
                   </div>
                 )}
               </div>
-            ))}
           </section>
         ))}
         {errorMsg && <div className="mensagem-erro" role="alert">{errorMsg}</div>}

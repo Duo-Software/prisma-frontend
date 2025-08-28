@@ -7,6 +7,7 @@ import {buscarTodosFormularios} from '../../services/formularioService';
 import {buscarInstituicoes} from '../../services/instituicaoService';
 import type { Formulario } from '../../types/formulario';
 import {listarByFilter} from "../../services/alunoService.ts";
+import {buscarAvaliacoesPorFiltros} from '../../services/avaliacaoService';
 
 const PageContainer = styled.div`
   padding: 2rem;
@@ -45,6 +46,26 @@ const Message = styled.div`
   box-shadow: ${({ theme }) => theme.boxShadow};
 `;
 
+const Button = styled.button`
+  padding: 0.5rem 1rem;
+  background: ${({ theme }) => theme.colors.primary};
+  color: white;
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+`;
+
 const GerenciamentoFormularios: React.FC = () => {
   const navigate = useNavigate();
   const [formularioId, setFormularioId] = useState('');
@@ -72,17 +93,17 @@ const GerenciamentoFormularios: React.FC = () => {
   }, []);
 
   // Simulação de dados para instituições
-useEffect(() => {
-      const buscarInstituicoesCombo = async () => {
-          try {
-            const response = await buscarInstituicoes();
-            setInstituicoes(response);
-          } catch (error) {
-            console.error('Erro ao carregar instituições:', error);
-          }
-      };
-      buscarInstituicoesCombo();
-    }, [formularioId]);
+  useEffect(() => {
+    const buscarInstituicoesCombo = async () => {
+      try {
+        const response = await buscarInstituicoes();
+        setInstituicoes(response);
+      } catch (error) {
+        console.error('Erro ao carregar instituições:', error);
+      }
+    };
+    buscarInstituicoesCombo();
+  }, [formularioId]);
 
   // Simulação de dados para alunos
   useEffect(() => {
@@ -100,34 +121,30 @@ useEffect(() => {
     buscarAlunos();
   }, [instituicaoId]);
 
-  // Simulação de dados para avaliações
-  useEffect(() => {
-    if (formularioId && instituicaoId && alunoId) {
-      setAvaliacoes([
-        {
-          id: 1,
-          formulario: 'Avaliação de Satisfação do Curso',
-          aluno: 'Laura Cristina Moreira',
-          data: '2025-08-09',
-          status: 'Enviada',
-        },
-        {
-          id: 2,
-          formulario: 'Avaliação de Instrutor',
-          aluno: 'Carlos Silva',
-          data: '2025-08-10',
-          status: 'Pendente',
-        },
-      ]);
+  const buscarAvaliacoes = async () => {
+    if (formularioId || instituicaoId || alunoId) {
+      try {
+        const response = await buscarAvaliacoesPorFiltros(
+          Number(formularioId),
+          Number(instituicaoId),
+          Number(alunoId)
+        );
+        setAvaliacoes(response);
+      } catch (error) {
+        console.error('Erro ao carregar avaliações:', error);
+        setAvaliacoes([]);
+      }
     }
-  }, [formularioId, instituicaoId, alunoId]);
+  };
 
   const handleVisualizar = (id: number) => {
-    navigate(`/formulario/${id}`);
+    navigate(`/formulario/visualizar/${id}`);
   };
 
   const handleCadastrar = () => {
-    navigate(`/formulario/${formularioId}`);
+    if (formularioId && alunoId) {
+      navigate(`/formulario/responder/${formularioId}/${alunoId}`);
+    }
   };
 
   const handleEditar = (id: number) => {
@@ -148,13 +165,13 @@ useEffect(() => {
 
       <SelectsContainer>
         <SelectBox
-            label="Formulário"
-            options={formularios.map(form => ({
-              id: form.id,
-              nome: form.nomeFormulario
-            }))}
-            value={formularioId}
-            onChange={setFormularioId}
+          label="Formulário"
+          options={formularios.map(form => ({
+            id: form.id,
+            nome: form.nomeFormulario
+          }))}
+          value={formularioId}
+          onChange={setFormularioId}
         />
 
         <SelectBox
@@ -177,7 +194,14 @@ useEffect(() => {
         />
       </SelectsContainer>
 
-      {formularioId && instituicaoId && alunoId ? (
+      <Button
+        onClick={buscarAvaliacoes}
+        disabled={!formularioId && !instituicaoId && !alunoId}
+      >
+        Buscar Avaliações
+      </Button>
+
+      {avaliacoes && avaliacoes.length > 0 ? (
         <AvaliacoesTable
           data={avaliacoes}
           onVisualizar={handleVisualizar}

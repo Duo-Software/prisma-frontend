@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import type {Aluno} from "../types/aluno.ts";
 
 interface TableProps {
   data: Array<{
     id: number;
     formulario: string;
-    aluno: string;
-    data: string;
-    status: string;
+    aluno: Aluno;
+    dataCadastro: string;
   }>;
   onVisualizar: (id: number) => void;
   onCadastrar: (id: number) => void;
@@ -70,20 +70,6 @@ const ActionButton = styled.button`
   }
 `;
 
-const StatusBadge = styled.span<{ status: string }>`
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  background: ${({ theme, status }) => 
-    status === 'Enviada' ? theme.colors.success + '20' : 
-    status === 'Pendente' ? theme.colors.warning + '20' : 
-    theme.colors.info + '20'};
-  color: ${({ theme, status }) => 
-    status === 'Enviada' ? theme.colors.success : 
-    status === 'Pendente' ? theme.colors.warning : 
-    theme.colors.info};
-`;
-
 const AvaliacoesTable: React.FC<TableProps> = ({
   data,
   onVisualizar,
@@ -95,24 +81,18 @@ const AvaliacoesTable: React.FC<TableProps> = ({
       <StyledTable>
         <thead>
           <tr>
-            <Th>ID</Th>
             <Th>Formulário</Th>
             <Th>Aluno</Th>
             <Th>Data</Th>
-            <Th>Status</Th>
             <Th>Ações</Th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
             <tr key={item.id}>
-              <Td>{item.id}</Td>
               <Td>{item.formulario}</Td>
-              <Td>{item.aluno}</Td>
-              <Td>{new Date(item.data).toLocaleDateString('pt-BR')}</Td>
-              <Td>
-                <StatusBadge status={item.status}>{item.status}</StatusBadge>
-              </Td>
+              <Td>{item.aluno.pessoa.nome}</Td>
+              <Td>{new Date(item.dataCadastro).toLocaleDateString('pt-BR')}</Td>
               <Td>
                 <ActionButton onClick={() => onVisualizar(item.id)}>
                   Visualizar

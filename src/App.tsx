@@ -14,6 +14,7 @@ import Relatorios from "./pages/relatorios/Relatorios.tsx";
 import RelatorioAlunosPdf from "./pages/relatorios/RelatorioAlunosPdf.tsx";
 import ResponderFormulario from './pages/formulario/ResponderFormulario';
 import GerenciamentoFormularios from "./pages/formulario/GerenciamentoFormularios.tsx";
+import VisualisarFormulario from "./pages/formulario/VisualisarFormulario.tsx";
 import { AuthProvider } from './hooks/useAuth';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
@@ -45,7 +46,8 @@ function App() {
                                     <Route path="/alunos/cadastro-aluno" element={<CadastroAluno />} />
                                     <Route path="/relatorios" element={<Relatorios />} />
                                     <Route path="/relatorios/relatorio-alunos-pdf" element={<RelatorioAlunosPdf />} />
-                                    <Route path="/formulario/:id" element={<ResponderFormulario />} />
+                                    <Route path="/formulario/responder/:idFormulario/:idAluno" element={<ResponderFormulario />} />
+                                    <Route path="/formulario/visualizar/:id" element={<VisualisarFormulario />} />
                                     <Route path="/formularios" element={<GerenciamentoFormularios />} />
                                 </Route>
                             </Route>

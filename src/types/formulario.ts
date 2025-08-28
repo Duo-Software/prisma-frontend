@@ -38,3 +38,22 @@ export interface Resposta {
   respostaTexto: string;
   alternativaIds: number[];
 }
+
+export interface RespostaAlternativa {
+  perguntaId: number;
+  resposta: string;
+  respostaTexto: string;
+  categoria: Categoria;
+  pergunta: Pergunta;
+  alternativas: Alternativa[];
+}
+
+export interface Avaliacao {
+  id: number;
+  aluno: any;
+  profissionalAvaliador: any;
+  dataCadastro: string;
+  formulario: string;
+  respostas: RespostaAlternativa[];
+  ativo: boolean;
+}
