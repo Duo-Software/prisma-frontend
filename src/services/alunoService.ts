@@ -1,12 +1,12 @@
 import type {Aluno, AlunoFilter} from "../types/aluno";
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Função para buscar aluno pelo CPF da pessoa
 export const buscarAlunoPorCpf = async (cpf: string): Promise<{ encontrado: boolean; aluno?: Aluno }> => {
   try {
-    const response = await axios.get(`${BASE_URL}/alunos/cpf/${cpf}`);
+    const response = await axios.get(`${API_URL}/alunos/cpf/${cpf}`);
     return {
       encontrado: true,
       aluno: response.data
@@ -42,13 +42,14 @@ export const formatarCpf = (cpf: string): string => {
 
 // Função para criar ou atualizar aluno
 export const salvarAluno = async (aluno: Aluno): Promise<Aluno> => {
+  console.log(aluno);
   if (aluno.id) {
     // Atualização
-    const response = await axios.put(`${BASE_URL}/alunos/${aluno.id}`, aluno);
+    const response = await axios.put(`${API_URL}/alunos/${aluno.id}`, aluno);
     return response.data;
   } else {
     // Criação
-    const response = await axios.post(`${BASE_URL}/alunos`, {
+    const response = await axios.post(`${API_URL}/alunos`, {
       ...aluno,
       dataCadastro: new Date().toISOString(),
       dataAlteracao: new Date().toISOString()
@@ -59,7 +60,7 @@ export const salvarAluno = async (aluno: Aluno): Promise<Aluno> => {
 
 // Função para listar todos os alunos
 export const listarTodos = async (): Promise<Aluno[]> => {
-  const response = await axios.get(`${BASE_URL}/alunos`);
+  const response = await axios.get(`${API_URL}/alunos`);
   return response.data;
 };
 
@@ -68,6 +69,6 @@ export const listarByFilter = async (instituicaoId: number): Promise<Aluno[]> =>
     instituicaoEnsino: instituicaoId,
     status: undefined
   };
-  const response = await axios.post(`${BASE_URL}/alunos/filter`, alunoFilter);
+  const response = await axios.post(`${API_URL}/alunos/filter`, alunoFilter);
   return response.data;
 };

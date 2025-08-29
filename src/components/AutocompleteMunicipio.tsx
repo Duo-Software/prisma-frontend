@@ -33,92 +33,100 @@ const SugestaoItem = styled.li`
 `;
 
 interface AutocompleteMunicipioProps {
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  uf?: string;
-  required?: boolean;
-  disabled?: boolean;
-  placeholder?: string;
+    id?: string;
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onSelect?: (municipio: Municipio) => void; // adiciona a prop onSelect
+    uf?: string;
+    required?: boolean;
+    disabled?: boolean;
+    placeholder?: string;
 }
 
 export const AutocompleteMunicipio: React.FC<AutocompleteMunicipioProps> = ({
-  name,
-  value,
-  onChange,
-  uf,
-  required,
-  disabled,
-  placeholder
-}) => {
-  const [sugestoes, setSugestoes] = useState<Municipio[]>([]);
-  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
-  const inputRef = useRef<HTMLDivElement>(null);
-
-  // Atualiza sugestões quando o valor do input muda
-  useEffect(() => {
-    if (value.length >= 2) {
-      const sugestoesFiltradas = filtrarMunicipios(value, uf);
-      setSugestoes(sugestoesFiltradas.slice(0, 10)); // Limita a 10 sugestões
-      setMostrarSugestoes(true);
-    } else {
-      setSugestoes([]);
-      setMostrarSugestoes(false);
-    }
-  }, [value, uf]);
-
-  // Fecha sugestões quando clica fora
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-        setMostrarSugestoes(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Seleciona um município das sugestões
-  const selecionarMunicipio = (municipio: Municipio) => {
-    const syntheticEvent = {
-      target: {
+        id,
         name,
-        value: municipio.nome
-      }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    onChange(syntheticEvent);
-    setMostrarSugestoes(false);
-  };
+        value,
+        onChange,
+        onSelect, // recebe a prop onSelect
+        uf,
+        required,
+        disabled,
+        placeholder
+    }) => {
+    const [sugestoes, setSugestoes] = useState<Municipio[]>([]);
+    const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+    const inputRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div ref={inputRef} style={{ position: 'relative' }}>
-      <InputPadrao
-        type="text"
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-        disabled={disabled}
-        placeholder={placeholder || "Digite o nome do município"}
-        onFocus={() => value.length >= 2 && setMostrarSugestoes(true)}
-      />
-      
-      {mostrarSugestoes && sugestoes.length > 0 && (
-        <SugestoesList>
-          {sugestoes.map((municipio, index) => (
-            <SugestaoItem
-              key={`${municipio.nome}-${municipio.uf}-${index}`}
-              onClick={() => selecionarMunicipio(municipio)}
-            >
-              {municipio.nome} - {municipio.uf}
-            </SugestaoItem>
-          ))}
-        </SugestoesList>
-      )}
-    </div>
-  );
+    // Atualiza sugestões quando o valor do input muda
+    useEffect(() => {
+        if (value.length >= 2) {
+            const sugestoesFiltradas = filtrarMunicipios(value, uf);
+            setSugestoes(sugestoesFiltradas.slice(0, 10)); // Limita a 10 sugestões
+            setMostrarSugestoes(true);
+        } else {
+            setSugestoes([]);
+            setMostrarSugestoes(false);
+        }
+    }, [value, uf]);
+
+    // Fecha sugestões quando clica fora
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+                setMostrarSugestoes(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // Seleciona um município das sugestões
+    const selecionarMunicipio = (municipio: Municipio) => {
+        const syntheticEvent = {
+            target: {
+                name,
+                value: municipio.nome
+            }
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        onChange(syntheticEvent);
+        if (onSelect) {
+            onSelect(municipio); // dispara o callback com id, nome e uf
+        }
+        setMostrarSugestoes(false);
+    };
+
+    return (
+        <div ref={inputRef} style={{ position: 'relative' }}>
+            <InputPadrao
+                type="text"
+                id={id}
+                name={name}
+                value={value}
+                onChange={onChange}
+                required={required}
+                disabled={disabled}
+                placeholder={placeholder || "Digite o nome do município"}
+                onFocus={() => value.length >= 2 && setMostrarSugestoes(true)}
+            />
+
+            {mostrarSugestoes && sugestoes.length > 0 && (
+                <SugestoesList>
+                    {sugestoes.map((municipio, index) => (
+                        <SugestaoItem
+                            key={`${municipio.nome}-${municipio.uf}-${index}`}
+                            onClick={() => selecionarMunicipio(municipio)}
+                        >
+                            {municipio.nome} - {municipio.uf}
+                        </SugestaoItem>
+                    ))}
+                </SugestoesList>
+            )}
+        </div>
+    );
 };

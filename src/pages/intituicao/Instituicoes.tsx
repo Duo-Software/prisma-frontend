@@ -131,7 +131,6 @@ const Instituicoes: React.FC = () => {
                                     <StatValue>{institution.nome}</StatValue>
                                     <StatLabel>{institution.municipio.nome} - {institution.municipio.unidadeFederativa.sigla}</StatLabel>
                                     <StatLabel>Tipo: {institution.tipoInstituicaoEnsino}</StatLabel>
-                                    <StatLabel>Alunos: {institution.totalAlunos}</StatLabel>
                                     <StatLabel>
                                         Status:
                                         <StatChange $isPositive={institution.ativo}>

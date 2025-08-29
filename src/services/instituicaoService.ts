@@ -9,13 +9,15 @@ export interface Instituicao {
     id: number;
     nome: string;
     unidadeFederativa: {
+      id: number;
       nome: string;
       sigla: string;
     }
   };
   ativo: boolean;
-  totalAlunos: number;
 }
+
+type InstituicaoCreate = Omit<Instituicao, 'id'> & { id?: null };
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -42,7 +44,7 @@ export const buscarInstituicaoPorId = async (id: number): Promise<Instituicao> =
 };
 
 // Função para criar uma nova instituição
-export const criarInstituicao = async (instituicao: Omit<Instituicao, 'id'>): Promise<Instituicao> => {
+export const criarInstituicao = async (instituicao: InstituicaoCreate): Promise<Instituicao> => {
   try {
     const response = await axios.post<Instituicao>(`${API_URL}/instituicoes-ensino`, instituicao);
     return response.data;
