@@ -2,15 +2,15 @@ import type {Pessoa} from "../services/pessoaService";
 import { StatusAluno } from "../mocks/status-aluno";
 
 export interface Aluno {
-  id: number;
+  id?: number;
   matricula?: string;
   pessoa: Pessoa;
   instituicaoEnsino: {
-    id: number | string;
-    nome: string;
-    sigla: string;
-    tipoInstituicaoEnsino: string;
-    municipio: {
+    id: number | string | undefined;
+    nome?: string;
+    sigla?: string;
+    tipoInstituicaoEnsino?: string;
+    municipio?: {
       id: number | string;
       nome: string;
       codigoIbge: number;
@@ -25,7 +25,7 @@ export interface Aluno {
         };
       };
     };
-    ativo: boolean;
+    ativo?: boolean;
   };
   status: StatusAluno;
   dataIngresso: string;

@@ -9,7 +9,6 @@ import Profissionais from "./pages/profissional/Profissionais.tsx";
 import CadastroProfissional from "./pages/profissional/CadastroProfissional.tsx";
 import Login from "./pages/logon/login.tsx";
 import Alunos from "./pages/aluno/Alunos.tsx";
-import CadastroAluno from "./pages/aluno/CadastroAluno.tsx";
 import Relatorios from "./pages/relatorios/Relatorios.tsx";
 import RelatorioAlunosPdf from "./pages/relatorios/RelatorioAlunosPdf.tsx";
 import ResponderFormulario from './pages/formulario/ResponderFormulario';
@@ -19,6 +18,7 @@ import { AuthProvider } from './hooks/useAuth';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import {CadastroAluno} from "./pages/aluno/CadastroAluno.tsx";
 
 
 function App() {

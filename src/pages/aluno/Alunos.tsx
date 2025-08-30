@@ -55,7 +55,7 @@ const Alunos: React.FC = () => {
             if (aluno?.pessoa?.cpf?.toLowerCase().includes(lowerValue)) return true;
 
             // Verificar na instituição
-            if (aluno.instituicaoEnsino.nome.toLowerCase().includes(lowerValue)) return true;
+            if (aluno.instituicaoEnsino?.nome?.toLowerCase().includes(lowerValue)) return true;
 
             // Verificar no status
             return aluno.status.toLowerCase().includes(lowerValue);

@@ -7,403 +7,448 @@ import { Etnia } from '../../mocks/etnia';
 import { municipiosBrasileiros } from '../../mocks/municipios-mock';
 
 const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
 `;
 
 const SubmitButton = styled.button`
-  padding: 8px 16px;
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.primaryLight};
-  }
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.primaryLight};
-    cursor: not-allowed;
-  }
+    padding: 8px 16px;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    &:hover {
+        background-color: ${({ theme }) => theme.colors.primaryLight};
+    }
+    &:disabled {
+        background-color: ${({ theme }) => theme.colors.primaryLight};
+        cursor: not-allowed;
+    }
 `;
 
 const CancelButton = styled.button`
-  padding: 8px 16px;
-  background-color: transparent;
-  color: ${({ theme }) => theme.colors.text};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.secondary};
-  }
+    padding: 8px 16px;
+    background-color: transparent;
+    color: ${({ theme }) => theme.colors.text};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    &:hover {
+        background-color: ${({ theme }) => theme.colors.secondary};
+    }
 `;
 
 const ModalGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
 `;
 
+const UFS = [
+    // { id: 1, nome: "Acre", sigla: "AC" },ok
+    // { id: 2, nome: "Alagoas", sigla: "AL" },
+    // { id: 3, nome: "Amapá", sigla: "AP" },
+    // { id: 4, nome: "Amazonas", sigla: "AM" },
+    // { id: 5, nome: "Bahia", sigla: "BA" },
+    // { id: 6, nome: "Ceará", sigla: "CE" },
+    // { id: 7, nome: "Distrito Federal", sigla: "DF" },
+    // { id: 8, nome: "Espírito Santo", sigla: "ES" },
+    // { id: 9, nome: "Goiás", sigla: "GO" },
+    // { id: 10, nome: "Maranhão", sigla: "MA" },
+    { id: 11, nome: "Mato Grosso", sigla: "MT" },
+    // { id: 12, nome: "Mato Grosso do Sul", sigla: "MS" },
+    // { id: 13, nome: "Minas Gerais", sigla: "MG" },
+    // { id: 14, nome: "Pará", sigla: "PA" },
+    // { id: 15, nome: "Paraíba", sigla: "PB" },
+    // { id: 16, nome: "Paraná", sigla: "PR" },
+    // { id: 17, nome: "Pernambuco", sigla: "PE" },
+    // { id: 18, nome: "Piauí", sigla: "PI" },
+    // { id: 19, nome: "Rio de Janeiro", sigla: "RJ" },
+    // { id: 20, nome: "Rio Grande do Norte", sigla: "RN" },
+    // { id: 21, nome: "Rio Grande do Sul", sigla: "RS" },
+    // { id: 22, nome: "Rondônia", sigla: "RO" },
+    // { id: 23, nome: "Roraima", sigla: "RR" },
+    // { id: 24, nome: "Santa Catarina", sigla: "SC" },
+    // { id: 25, nome: "São Paulo", sigla: "SP" },
+    // { id: 26, nome: "Sergipe", sigla: "SE" },
+    // { id: 27, nome: "Tocantins", sigla: "TO" },
+];
+
 interface Pessoa {
-  id: string;
-  nome: string;
-  cpf: string;
-  sexo: string;
-  etnia: string;
-  dataNascimento: string;
-  paisNaturalidade: { id: string; nome: string };
-  ufNaturalidade: { id: string; sigla: string; nome: string };
-  municipioNaturalidade: { id: string; nome: string; uf: string };
-  nomeMae: string;
-  nomePai: string;
-  endereco: string;
-  email: string;
-  telefone: string;
-  dataCadastro: string;
-  dataAlteracao: string;
+    id: string;
+    nome: string;
+    cpf: string;
+    sexo: string;
+    etnia: string;
+    dataNascimento: string;
+    paisNaturalidade: { id: string; nome: string };
+    ufNaturalidade: { id: string; sigla: string; nome: string };
+    municipioNaturalidade: { id: string; nome: string; uf: string };
+    nomeMae: string;
+    nomePai: string;
+    endereco: string;
+    email: string;
+    telefone: string;
+    dataCadastro: string;
+    dataAlteracao: string;
 }
 
 interface PessoaModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (pessoa: Pessoa) => void;
-  initialData?: Pessoa;
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (pessoa: Pessoa) => void;
+    initialData?: Pessoa;
 }
 
 const initialPessoaState: Pessoa = {
-  id: "",
-  nome: "",
-  cpf: "",
-  sexo: "",
-  etnia: "",
-  dataNascimento: "",
-  paisNaturalidade: { id: "", nome: "" },
-  ufNaturalidade: { id: "", sigla: "", nome: "" },
-  municipioNaturalidade: { id: "", nome: "", uf: "" },
-  nomeMae: "",
-  nomePai: "",
-  endereco: "",
-  email: "",
-  telefone: "",
-  dataCadastro: "",
-  dataAlteracao: ""
+    id: "",
+    nome: "",
+    cpf: "",
+    sexo: "",
+    etnia: "",
+    dataNascimento: "",
+    paisNaturalidade: { id: "", nome: "" },
+    ufNaturalidade: { id: "", sigla: "", nome: "" },
+    municipioNaturalidade: { id: "", nome: "", uf: "" },
+    nomeMae: "",
+    nomePai: "",
+    endereco: "",
+    email: "",
+    telefone: "",
+    dataCadastro: "",
+    dataAlteracao: ""
 };
 
 const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, initialData }) => {
-  const [pessoa, setPessoa] = useState<Pessoa>(initialPessoaState);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const [pessoa, setPessoa] = useState<Pessoa>(initialPessoaState);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (initialData) {
-      setPessoa(initialData);
-    } else {
-      setPessoa(initialPessoaState);
+    useEffect(() => {
+        if (initialData) {
+            setPessoa(initialData);
+        } else {
+            setPessoa(initialPessoaState);
+        }
+    }, [initialData, isOpen]);
+
+    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { name, value } = e.target;
+
+        if (name.includes('.')) {
+            const [parent, child] = name.split('.') as [keyof Pessoa, string];
+            setPessoa(prev => {
+                // Verifique se o campo pai é um objeto
+                const parentValue = prev[parent];
+
+                // Só faz o spread se for um objeto e for diferente de null
+                if (parentValue && typeof parentValue === "object") {
+                    return {
+                        ...prev,
+                        [parent]: {
+                            ...parentValue,
+                            [child]: value
+                        }
+                    };
+                }
+                // Caso não seja objeto, retorna o estado anterior sem alteração
+                return prev;
+            });
+        } else {
+            setPessoa(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     }
-  }, [initialData, isOpen]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    const { name, value } = e.target;
+  function handlePaisSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+      const selectedValue = e.target.value;
+      // No momento só existe a opção Brasil (id = "1")
+      setPessoa(prev => ({
+          ...prev,
+          paisNaturalidade: selectedValue
+              ? { id: "1", nome: "Brasil" }
+              : { id: "", nome: "" }
+      }));
+  }
 
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.') as [keyof Pessoa, string];
-      setPessoa(prev => {
-        // Verifique se o campo pai é um objeto
-        const parentValue = prev[parent];
-
-        // Só faz o spread se for um objeto e for diferente de null
-        if (parentValue && typeof parentValue === "object") {
-          return {
+    function handleUfSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+        const ufSigla = e.target.value;
+        setPessoa(prev => ({
             ...prev,
-            [parent]: {
-              ...parentValue,
-              [child]: value
+            ufNaturalidade: {
+                id: e.target.options[e.target.selectedIndex].id,
+                sigla: ufSigla,
+                nome: ufSigla ? e.target.options[e.target.selectedIndex].text : ""
+            },
+            municipioNaturalidade: {
+                id: "",
+                nome: "",
+                uf: ufSigla
             }
-          };
-        }
-        // Caso não seja objeto, retorna o estado anterior sem alteração
-        return prev;
-      });
-    } else {
-      setPessoa(prev => ({
-        ...prev,
-        [name]: value
-      }));
+        }));
     }
-  }
 
-  function handleUfSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    const ufSigla = e.target.value;
-    setPessoa(prev => ({
-      ...prev,
-      ufNaturalidade: {
-        id: "",
-        sigla: ufSigla,
-        nome: ufSigla ? e.target.options[e.target.selectedIndex].text : ""
-      },
-      municipioNaturalidade: {
-        id: "",
-        nome: "",
-        uf: ufSigla
-      }
-    }));
-  }
+    function handleMunicipioSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+        const municipioNome = e.target.value;
+        const ufSigla = pessoa.ufNaturalidade.sigla;
+        const municipio = municipiosBrasileiros.find(m => m.nome === municipioNome && m.uf === ufSigla);
 
-  function handleMunicipioSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    const municipioNome = e.target.value;
-    const ufSigla = pessoa.ufNaturalidade.sigla;
-    const municipio = municipiosBrasileiros.find(m => m.nome === municipioNome && m.uf === ufSigla);
-
-    if (municipio) {
-      setPessoa(prev => ({
-        ...prev,
-        municipioNaturalidade: {
-          id: "",
-          nome: municipio.nome,
-          uf: municipio.uf
+        if (municipio) {
+            setPessoa(prev => ({
+                ...prev,
+                municipioNaturalidade: {
+                    id: municipio.id.toString(),
+                    nome: municipio.nome,
+                    uf: municipio.uf
+                }
+            }));
         }
-      }));
     }
-  }
 
-  const handleSubmit = () => {
-    setIsSubmitting(true);
+    const handleSubmit = () => {
+        setIsSubmitting(true);
 
-    // Criar uma cópia atualizada para enviar ao parent
-    const updatedPessoa = {
-      ...pessoa,
-      dataCadastro: pessoa.dataCadastro || new Date().toISOString(),
-      dataAlteracao: new Date().toISOString()
+        // Criar uma cópia atualizada para enviar ao parent
+        const updatedPessoa = {
+            ...pessoa,
+            dataCadastro: pessoa.dataCadastro || new Date().toISOString(),
+            dataAlteracao: new Date().toISOString()
+        };
+
+        // Simulação de API call
+        setTimeout(() => {
+            onSave(updatedPessoa);
+            setIsSubmitting(false);
+            onClose();
+        }, 500);
     };
 
-    // Simulação de API call
-    setTimeout(() => {
-      onSave(updatedPessoa);
-      setIsSubmitting(false);
-      onClose();
-    }, 500);
-  };
+    const municipiosFiltrados = municipiosBrasileiros
+        .filter(m => m.uf === pessoa.ufNaturalidade.sigla)
+        .sort((a, b) => a.nome.localeCompare(b.nome));
 
-  const ufsFiltered = municipiosBrasileiros
-    .map(m => ({ sigla: m.uf, nome: m.uf }))
-    .filter((v, i, a) => a.findIndex(t => t.sigla === v.sigla) === i)
-    .sort((a, b) => a.sigla.localeCompare(b.sigla));
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Cadastro de Dados Pessoais"
+            width="800px"
+        >
+            <ModalGrid>
+                <StatLabel>
+                    Nome:
+                    <InputPadrao
+                        type="text"
+                        name="nome"
+                        value={pessoa.nome}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    CPF:
+                    <InputPadrao
+                        type="text"
+                        name="cpf"
+                        value={pessoa.cpf}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Sexo:
+                    <select
+                        name="sexo"
+                        value={pessoa.sexo}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                        style={{
+                            width: "100%",
+                            padding: 8,
+                            marginTop: 4,
+                            marginBottom: 4,
+                            display: "block"
+                        }}
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                    </select>
+                </StatLabel>
+                <StatLabel>
+                    Etnia:
+                    <select
+                        name="etnia"
+                        value={pessoa.etnia}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                        style={{
+                            width: "100%",
+                            padding: 8,
+                            marginTop: 4,
+                            marginBottom: 4,
+                            display: "block"
+                        }}
+                    >
+                        <option value="">Selecione...</option>
+                        {Object.values(Etnia).map(etnia => (
+                            <option key={etnia} value={etnia}>{etnia}</option>
+                        ))}
+                    </select>
+                </StatLabel>
+                <StatLabel>
+                    Data de Nascimento:
+                    <InputPadrao
+                        type="date"
+                        name="dataNascimento"
+                        value={pessoa.dataNascimento}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Nome da Mãe:
+                    <InputPadrao
+                        type="text"
+                        name="nomeMae"
+                        value={pessoa.nomeMae}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Nome do Pai:
+                    <InputPadrao
+                        type="text"
+                        name="nomePai"
+                        value={pessoa.nomePai}
+                        onChange={handleChange}
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Endereço:
+                    <InputPadrao
+                        type="text"
+                        name="endereco"
+                        value={pessoa.endereco}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Email:
+                    <InputPadrao
+                        type="email"
+                        name="email"
+                        value={pessoa.email}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    Telefone:
+                    <InputPadrao
+                        type="tel"
+                        name="telefone"
+                        value={pessoa.telefone}
+                        onChange={handleChange}
+                        required
+                        disabled={isSubmitting}
+                    />
+                </StatLabel>
+                <StatLabel>
+                    País de Naturalidade:
+                    <select
+                        name="paisNaturalidade.id"
+                        value={pessoa.paisNaturalidade.id}
+                        onChange={handlePaisSelect}
+                        required
+                        disabled={isSubmitting}
+                        style={{
+                            width: "100%",
+                            padding: 8,
+                            marginTop: 4,
+                            marginBottom: 4,
+                            display: "block"
+                        }}
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="1">Brasil</option>
+                    </select>
+                </StatLabel>
+                <StatLabel>
+                    UF de Naturalidade:
+                    <select
+                        name="ufNaturalidade.sigla"
+                        value={pessoa.ufNaturalidade.sigla}
+                        onChange={handleUfSelect}
+                        required
+                        disabled={isSubmitting}
+                        style={{
+                            width: "100%",
+                            padding: 8,
+                            marginTop: 4,
+                            marginBottom: 4,
+                            display: "block"
+                        }}
+                    >
+                        <option value="">Selecione...</option>
+                        {UFS.map(uf => (
+                            <option id={uf.id.toString()} key={uf.sigla} value={uf.sigla}>{uf.nome} - {uf.sigla}</option>
+                        ))}
+                    </select>
+                </StatLabel>
+                <StatLabel>
+                    Município de Naturalidade:
+                    <select
+                        name="municipioNaturalidade.nome"
+                        value={pessoa.municipioNaturalidade.nome}
+                        onChange={handleMunicipioSelect}
+                        required
+                        disabled={isSubmitting || !pessoa.ufNaturalidade.sigla}
+                        style={{
+                            width: "100%",
+                            padding: 8,
+                            marginTop: 4,
+                            marginBottom: 4,
+                            display: "block"
+                        }}
+                    >
+                        <option value="">Selecione...</option>
+                        {municipiosFiltrados.map(municipio => (
+                            <option id={municipio.id.toString()} key={municipio.nome} value={municipio.nome}>{municipio.nome}</option>
+                        ))}
+                    </select>
+                </StatLabel>
+            </ModalGrid>
 
-  const municipiosFiltrados = municipiosBrasileiros
-    .filter(m => m.uf === pessoa.ufNaturalidade.sigla)
-    .sort((a, b) => a.nome.localeCompare(b.nome));
-
-  return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
-      title="Cadastro de Dados Pessoais"
-      width="800px"
-    >
-      <ModalGrid>
-        <StatLabel>
-          Nome:
-          <InputPadrao
-            type="text"
-            name="nome"
-            value={pessoa.nome}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          CPF:
-          <InputPadrao
-            type="text"
-            name="cpf"
-            value={pessoa.cpf}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Sexo:
-          <select
-            name="sexo"
-            value={pessoa.sexo}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginTop: 4,
-              marginBottom: 4,
-              display: "block"
-            }}
-          >
-            <option value="">Selecione...</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
-          </select>
-        </StatLabel>
-        <StatLabel>
-          Etnia:
-          <select
-            name="etnia"
-            value={pessoa.etnia}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginTop: 4,
-              marginBottom: 4,
-              display: "block"
-            }}
-          >
-            <option value="">Selecione...</option>
-            {Object.values(Etnia).map(etnia => (
-              <option key={etnia} value={etnia}>{etnia}</option>
-            ))}
-          </select>
-        </StatLabel>
-        <StatLabel>
-          Data de Nascimento:
-          <InputPadrao
-            type="date"
-            name="dataNascimento"
-            value={pessoa.dataNascimento}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Nome da Mãe:
-          <InputPadrao
-            type="text"
-            name="nomeMae"
-            value={pessoa.nomeMae}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Nome do Pai:
-          <InputPadrao
-            type="text"
-            name="nomePai"
-            value={pessoa.nomePai}
-            onChange={handleChange}
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Endereço:
-          <InputPadrao
-            type="text"
-            name="endereco"
-            value={pessoa.endereco}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Email:
-          <InputPadrao
-            type="email"
-            name="email"
-            value={pessoa.email}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          Telefone:
-          <InputPadrao
-            type="tel"
-            name="telefone"
-            value={pessoa.telefone}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          País de Naturalidade:
-          <InputPadrao
-            type="text"
-            name="paisNaturalidade.nome"
-            value={pessoa.paisNaturalidade.nome}
-            onChange={handleChange}
-            required
-            disabled={isSubmitting}
-          />
-        </StatLabel>
-        <StatLabel>
-          UF de Naturalidade:
-          <select
-            name="ufNaturalidade.sigla"
-            value={pessoa.ufNaturalidade.sigla}
-            onChange={handleUfSelect}
-            required
-            disabled={isSubmitting}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginTop: 4,
-              marginBottom: 4,
-              display: "block"
-            }}
-          >
-            <option value="">Selecione...</option>
-            {ufsFiltered.map(uf => (
-              <option key={uf.sigla} value={uf.sigla}>{uf.sigla}</option>
-            ))}
-          </select>
-        </StatLabel>
-        <StatLabel>
-          Município de Naturalidade:
-          <select
-            name="municipioNaturalidade.nome"
-            value={pessoa.municipioNaturalidade.nome}
-            onChange={handleMunicipioSelect}
-            required
-            disabled={isSubmitting || !pessoa.ufNaturalidade.sigla}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginTop: 4,
-              marginBottom: 4,
-              display: "block"
-            }}
-          >
-            <option value="">Selecione...</option>
-            {municipiosFiltrados.map(municipio => (
-              <option key={municipio.nome} value={municipio.nome}>{municipio.nome}</option>
-            ))}
-          </select>
-        </StatLabel>
-      </ModalGrid>
-
-      <ButtonsContainer>
-        <CancelButton onClick={onClose} disabled={isSubmitting}>Cancelar</CancelButton>
-        <SubmitButton onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Salvando...' : 'Salvar'}
-        </SubmitButton>
-      </ButtonsContainer>
-    </Modal>
-  );
+            <ButtonsContainer>
+                <CancelButton onClick={onClose} disabled={isSubmitting}>Cancelar</CancelButton>
+                <SubmitButton onClick={handleSubmit} disabled={isSubmitting}>
+                    {isSubmitting ? 'Salvando...' : 'Salvar'}
+                </SubmitButton>
+            </ButtonsContainer>
+        </Modal>
+    );
 };
 
 export default PessoaModal;

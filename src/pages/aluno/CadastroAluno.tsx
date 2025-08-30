@@ -27,7 +27,8 @@ import { buscarPessoaPorCpf, type Pessoa, formatarCpf } from "../../services/pes
 import styled from "styled-components";
 import { CustomSelect } from "../../components/layout/CustomSelect.tsx";
 import type {Aluno} from "../../types/aluno";
-import { buscarAlunoPorCpf } from "../../services/alunoService.ts";
+import {buscarAlunoPorCpf, salvarAluno} from "../../services/alunoService.ts";
+import {Etnia} from "../../mocks/etnia.ts";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -65,17 +66,27 @@ const initialPessoaState: Pessoa = {
   dataAlteracao: ""
 };
 
-const initialFormState = {
-    id: 0,
+interface alunoPayloadDef {
+    id: number | undefined,
+    pessoa: Pessoa,
+    instituicaoNome: string,
+    instituicaoId: number | undefined | string,
+    status: string,
+    dataIngresso: string,
+    dataEgresso: string
+};
+
+const initialFormState: alunoPayloadDef = {
+    id: undefined,
     pessoa: initialPessoaState,
     instituicaoNome: "",
-    instituicaoId: "",
+    instituicaoId: undefined,
     status: StatusAluno.MATRICULADO,
     dataIngresso: "",
     dataEgresso: ""
 };
 
-const CadastroAluno: React.FC = () => {
+export const CadastroAluno: React.FC = () => {
     const [form, setForm] = useState(initialFormState);
     const [submitted, setSubmitted] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -121,7 +132,7 @@ const CadastroAluno: React.FC = () => {
                     dataAlteracao: pessoaData.dataAlteracao || ""
                 },
                 instituicaoNome: alunoData.instituicaoEnsino?.nome || "",
-                instituicaoId: alunoData.instituicaoEnsino?.id?.toString() || "",
+                instituicaoId: alunoData.instituicaoEnsino?.id || undefined || "",
                 status: alunoData.status || "",
                 dataIngresso: alunoData.dataIngresso ? alunoData.dataIngresso.split('T')[0] : "",
                 dataEgresso: alunoData.dataEgresso ? alunoData.dataEgresso.split('T')[0] : ""
@@ -157,8 +168,8 @@ const CadastroAluno: React.FC = () => {
                     setForm({
                         id: alunoEncontrado.id,
                         pessoa: alunoEncontrado.pessoa,
-                        instituicaoNome: alunoEncontrado.instituicaoEnsino.nome,
-                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id.toString() : "",
+                        instituicaoNome: alunoEncontrado.instituicaoEnsino?.nome || "",
+                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id : "",
                         status: alunoEncontrado.status,
                         dataIngresso: alunoEncontrado.dataIngresso.split('T')[0],
                         dataEgresso: alunoEncontrado.dataEgresso ? alunoEncontrado.dataEgresso.split('T')[0] : ""
@@ -463,7 +474,39 @@ const CadastroAluno: React.FC = () => {
                                 >
                                     Cancelar
                                 </ButtonStyled>
-                                <ButtonStyled type="submit" disabled={submitted}>
+                                <ButtonStyled
+                                    type="button"
+                                    disabled={submitted}
+                                    onClick={async () => {
+                                        setSubmitted(true);
+                                        try {
+                                            const etniaEnumValue = Object.entries(Etnia).find(([enumValue]) =>
+                                                enumValue === form.pessoa.etnia
+                                            )?.[1] || "";
+                                            form.pessoa.etnia = etniaEnumValue;
+                                            // Preparar objeto aluno
+                                            const alunoPayload: Aluno = {
+                                                id: form.id,
+                                                pessoa: form.pessoa,
+                                                instituicaoEnsino: {
+                                                    id: form.instituicaoId
+                                                },
+                                                status: form.status as StatusAluno,
+                                                dataIngresso: new Date(form.dataIngresso).toISOString(),
+                                                dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
+                                                dataCadastro: "", // Será preenchido pelo backend
+                                                dataAlteracao: "" // Será preenchido pelo backend
+                                            };
+                                            await salvarAluno(alunoPayload);
+                                            navigate('/alunos'); // Redireciona após salvar com sucesso
+                                        } catch (error) {
+                                            console.error('Erro ao salvar aluno:', error);
+                                            alert('Ocorreu um erro ao salvar o aluno. Por favor, tente novamente.');
+                                        } finally {
+                                            setSubmitted(false);
+                                        }
+                                    }}
+                                >
                                     {submitted ? "Salvando..." : (isEditing ? "Atualizar" : "Cadastrar")}
                                 </ButtonStyled>
                             </div>
@@ -486,5 +529,3 @@ const CadastroAluno: React.FC = () => {
         </>
     );
 };
-
-export default CadastroAluno;
