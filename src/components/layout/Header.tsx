@@ -1,12 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FiUser, FiSun, FiMoon } from 'react-icons/fi';
+import {FiUser, FiSun, FiMoon, FiLogOut} from 'react-icons/fi';
 import { useTheme } from '../../context/ThemeContext';
+import { authService } from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
+
 
 const Header: React.FC = () => {
-  const { themeMode, toggleTheme } = useTheme();
+    const { themeMode, toggleTheme } = useTheme();
+    const navigate = useNavigate();
 
-  return (
+
+    const handleLogout = () => {
+        authService.logout();
+        navigate('/login');
+    };
+
+
+    return (
       <HeaderContainer>
         <ActionsContainer>
           <ThemeToggleButton $themeMode={themeMode} onClick={toggleTheme}>
@@ -21,6 +32,8 @@ const Header: React.FC = () => {
           <ProfileButton>
             <ProfileAvatar>
               <FiUser />
+                <FiLogOut onClick={handleLogout} title="Sair"
+                />
             </ProfileAvatar>
           </ProfileButton>
         </ActionsContainer>
