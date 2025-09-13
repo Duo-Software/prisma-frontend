@@ -29,6 +29,9 @@ import { CustomSelect } from "../../components/layout/CustomSelect.tsx";
 import type {Aluno} from "../../types/aluno";
 import {buscarAlunoPorCpf, salvarAluno} from "../../services/alunoService.ts";
 import {Etnia} from "../../mocks/etnia.ts";
+import { buscarDiagnosticoPorPessoa, atualizarDiagnostico, cadastrarDiagnostico } from '../../services/diagnosticoPessoaService.ts';
+import AvaliacaoAlunoModal from '../../components/modal/AvaliacaoAlunoModal';
+import { recuperaArquivoById } from '../../services/arquivoService';
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -74,7 +77,7 @@ interface alunoPayloadDef {
     status: string,
     dataIngresso: string,
     dataEgresso: string
-};
+}
 
 const initialFormState: alunoPayloadDef = {
     id: undefined,
@@ -96,6 +99,9 @@ export const CadastroAluno: React.FC = () => {
     const [pessoaEncontrada, setPessoaEncontrada] = useState(false);
     const [buscaEfetuada, setBuscaEfetuada] = useState(false);
     const [alunoExistente, setAlunoExistente] = useState(false);
+    const [avaliacaoAluno, setAvaliacaoAluno] = useState<any>(null);
+    const [isModalAvaliacaoOpen, setIsModalAvaliacaoOpen] = useState(false);
+    const [avaliacaoEdit, setAvaliacaoEdit] = useState<any>(null);
     const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
     const location = useLocation();
@@ -146,6 +152,24 @@ export const CadastroAluno: React.FC = () => {
             setCpfSearch(pessoaData.cpf || "");
         }
     }, [location]);
+
+    // Buscar avaliação do aluno ao encontrar pessoa
+    useEffect(() => {
+        const fetchAvaliacao = async () => {
+            if (pessoaEncontrada && form.pessoa.id) {
+                try {
+                    const diagnostico = await buscarDiagnosticoPorPessoa(form.pessoa.id);
+                    setAvaliacaoAluno(diagnostico);
+                } catch (e) {
+                    setAvaliacaoAluno(null);
+                }
+            } else {
+                setAvaliacaoAluno(null);
+            }
+        };
+        fetchAvaliacao();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pessoaEncontrada, form.pessoa.id]);
 
     // Função para buscar pessoa e aluno por CPF
     const buscarPessoa = async () => {
@@ -245,6 +269,7 @@ export const CadastroAluno: React.FC = () => {
         setPessoaEncontrada(true);
     }
 
+
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
@@ -313,6 +338,27 @@ export const CadastroAluno: React.FC = () => {
         }, 1500);
     }
 
+    // Função para download do arquivo
+    const handleDownloadArquivo = async () => {
+        if (avaliacaoAluno?.arquivo?.idArquivo) {
+            try {
+                const arquivo = await recuperaArquivoById(avaliacaoAluno.arquivo.idArquivo);
+                if (arquivo && arquivo.conteudo) {
+                    const link = document.createElement('a');
+                    link.href = `data:${arquivo.tipo};base64,${arquivo.conteudo}`;
+                    link.download = arquivo.nome;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert('Arquivo não encontrado ou sem conteúdo.');
+                }
+            } catch (e) {
+                alert('Erro ao baixar arquivo.');
+            }
+        }
+    };
+
     return (
         <>
             <DefaultContainer>
@@ -322,7 +368,7 @@ export const CadastroAluno: React.FC = () => {
                     $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
                 >
                     <CardTitle>
-                        <h1>{isEditing ? "Edição de Aluno" : "Cadastro de Aluno"}</h1>
+                        <b>{isEditing ? "Edição de Aluno" : "Cadastro de Aluno"}</b>
                     </CardTitle>
                 </FixedHeader>
             </DefaultContainer>
@@ -456,6 +502,96 @@ export const CadastroAluno: React.FC = () => {
                                 </StatLabel>
                             </CardGrid>
                         )}
+
+                        {/* Seção Avaliação do Aluno */}
+                        {pessoaEncontrada && (
+                            <CardGrid style={{ padding: 20, minWidth: 450, marginBottom: 20  }}>
+                                <h3 style={{ marginTop: 0 }}>Avaliação do Aluno</h3>
+                                <div style={{ textAlign: 'right', marginBottom: 10 }}>
+                                    {avaliacaoAluno ? (
+                                        <ButtonStyled type="button" onClick={() => {
+                                            setAvaliacaoEdit(avaliacaoAluno);
+                                            setIsModalAvaliacaoOpen(true);
+                                        }} style={{ padding: '4px 16px', fontSize: 14 }}>
+                                            Editar
+                                        </ButtonStyled>
+                                    ) : (
+                                        <ButtonStyled type="button" onClick={() => {
+                                            setAvaliacaoEdit({
+                                                idDiagnosticoPessoa: 0,
+                                                idPessoa: form.pessoa.id,
+                                                cid: '',
+                                                status: '',
+                                                parecer: '',
+                                                idProfissionalResponsavel: 0,
+                                                arquivo: undefined
+                                            });
+                                            setIsModalAvaliacaoOpen(true);
+                                        }} style={{ padding: '4px 16px', fontSize: 14 }}>
+                                            Cadastrar
+                                        </ButtonStyled>
+                                    )}
+                                </div>
+                                {avaliacaoAluno ? (
+                                    <>
+                                        <StatLabel>
+                                            CID: <span>{avaliacaoAluno.cid}</span>
+                                        </StatLabel>
+                                        <StatLabel>
+                                            Status: <span>{avaliacaoAluno.status}</span>
+                                        </StatLabel>
+                                        <StatLabel>
+                                            Parecer: <span>{avaliacaoAluno.parecer}</span>
+                                        </StatLabel>
+                                        <StatLabel>
+                                            Profissional Responsável: <span>{avaliacaoAluno.nomeProfissionalResponsavel}</span>
+                                        </StatLabel>
+                                        <StatLabel>
+                                            Arquivo: {avaliacaoAluno.arquivo && avaliacaoAluno.arquivo.idArquivo ? (
+                                                <a
+                                                    href="#"
+                                                    style={{ color: theme.colors.primary }}
+                                                    onClick={e => {
+                                                        e.preventDefault();
+                                                        handleDownloadArquivo();
+                                                    }}
+                                                >
+                                                    {avaliacaoAluno.arquivo.nome}
+                                                </a>
+                                            ) : (
+                                                <span>Não informado</span>
+                                            )}
+                                        </StatLabel>
+                                    </>
+                                ) : (
+                                    <span>Nenhuma avaliação cadastrada para este aluno.</span>
+                                )}
+                            </CardGrid>
+                        )}
+
+                        {/* Modal de edição/cadastro da Avaliação do Aluno */}
+                        <AvaliacaoAlunoModal
+                            isOpen={isModalAvaliacaoOpen}
+                            onClose={() => setIsModalAvaliacaoOpen(false)}
+                            initialData={avaliacaoEdit}
+                            isCadastro={!avaliacaoAluno}
+                            onSave={async (dados) => {
+                                try {
+                                    if (!avaliacaoAluno) {
+                                        // Cadastro
+                                        const novo = await cadastrarDiagnostico(dados);
+                                        setAvaliacaoAluno(novo);
+                                    } else {
+                                        // Edição
+                                        await atualizarDiagnostico(dados?.idDiagnosticoPessoa, dados);
+                                        setAvaliacaoAluno(dados);
+                                    }
+                                    setIsModalAvaliacaoOpen(false);
+                                } catch (err) {
+                                    alert('Erro ao salvar avaliação.');
+                                }
+                            }}
+                        />
 
                         {/* Modal para edição/cadastro de dados pessoais */}
                         <PessoaModal

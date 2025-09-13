@@ -110,7 +110,7 @@ const Profissionais: React.FC = () => {
                                 <StatLabel>Cargo: {profissional.cargo}</StatLabel>
                                 <StatLabel>Email: {profissional.pessoa.email}</StatLabel>
                                 <StatLabel>Telefone: {profissional.pessoa.telefone}</StatLabel>
-                                <StatLabel>Instituição: {profissional.instituicaoEnsino.nome}</StatLabel>
+                                <StatLabel>Instituição: {profissional.instituicaoEnsino?.nome}</StatLabel>
                                 <StatLabel>
                                     Status:
                                     <StatChange $isPositive={profissional.ativo}>
