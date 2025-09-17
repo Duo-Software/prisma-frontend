@@ -122,6 +122,7 @@ const GerenciamentoFormularios: React.FC = () => {
   }, [instituicaoId]);
 
   const buscarAvaliacoes = async () => {
+    setAvaliacoes([])
     if (formularioId || instituicaoId || alunoId) {
       try {
         const response = await buscarAvaliacoesPorFiltros(
@@ -141,9 +142,9 @@ const GerenciamentoFormularios: React.FC = () => {
     navigate(`/formulario/visualizar/${id}`);
   };
 
-  const handleCadastrar = () => {
-    if (formularioId && alunoId) {
-      navigate(`/formulario/responder/${formularioId}/${alunoId}`);
+  const handleCadastrar = (alunoCadastroId?: number) => {
+    if (formularioId && alunoCadastroId) {
+      navigate(`/formulario/responder/${formularioId}/${alunoCadastroId}`);
     }
   };
 

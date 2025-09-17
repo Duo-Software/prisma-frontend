@@ -32,8 +32,8 @@ export const buscarAvaliacoesPorFiltros = async (
   try {
     const params: Record<string, number | undefined> = {};
     if (idAluno !== undefined && idAluno > 0) params.idAluno = idAluno;
-    else if (idInstituicao !== undefined && idInstituicao > 0) params.idInstituicao = idInstituicao;
-    else if (idFormulario !== undefined && idFormulario > 0) params.idFormulario = idFormulario;
+    if (idInstituicao !== undefined && idInstituicao > 0) params.idInstituicao = idInstituicao;
+    if (idFormulario !== undefined && idFormulario > 0) params.idFormulario = idFormulario;
 
     const response = await axios.get<Avaliacao[]>(`${API_URL}/avaliacoes/filter`, { params });
     return response.data;

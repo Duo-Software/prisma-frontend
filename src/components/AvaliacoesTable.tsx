@@ -10,7 +10,7 @@ interface TableProps {
     dataCadastro: string;
   }>;
   onVisualizar: (id: number) => void;
-  onCadastrar: (id: number) => void;
+  onCadastrar: (id: number | undefined) => void;
   onEditar: (id: number) => void;
 }
 
@@ -92,15 +92,15 @@ const AvaliacoesTable: React.FC<TableProps> = ({
             <tr key={item.id}>
               <Td>{item.formulario}</Td>
               <Td>{item.aluno.pessoa.nome}</Td>
-              <Td>{new Date(item.dataCadastro).toLocaleDateString('pt-BR')}</Td>
+              <Td>{item.dataCadastro ? new Date(item.dataCadastro).toLocaleDateString('pt-BR'): '-'}</Td>
               <Td>
-                <ActionButton onClick={() => onVisualizar(item.id)}>
+                <ActionButton hidden={item.id === null} onClick={() => onVisualizar(item.id)}>
                   Visualizar
                 </ActionButton>
-                <ActionButton onClick={() => onCadastrar(item.id)}>
+                <ActionButton hidden={item.id !== null} onClick={() => onCadastrar(item?.aluno?.id)}>
                   Cadastrar
                 </ActionButton>
-                <ActionButton onClick={() => onEditar(item.id)}>
+                <ActionButton hidden={true} onClick={() => onEditar(item.id)}>
                   Editar
                 </ActionButton>
               </Td>
