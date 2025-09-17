@@ -19,6 +19,13 @@ import { StatusAluno } from "../../mocks/status-aluno.ts";
 import {listarByFilter} from "../../services/alunoService";
 import type {Aluno} from "../../types/aluno.ts";
 
+function formatarCpf(cpf: string = ""): string {
+    return cpf.replace(/\D/g, "") // remove não dígitos
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
 const Alunos: React.FC = () => {
     const [search, setSearch] = useState("");
     const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -31,7 +38,7 @@ const Alunos: React.FC = () => {
         const fetchAlunos = async () => {
             try {
                 const data = await listarByFilter(undefined);
-                setAlunos(data);
+                setAlunos(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error('Erro ao carregar alunos:', error);
             } finally {
@@ -141,8 +148,11 @@ const Alunos: React.FC = () => {
                             <Card style={{ marginBottom: '1rem' }}>
                                 <StatContent>
                                     <StatValue>{aluno.pessoa.nome}</StatValue>
-                                    <StatLabel>CPF: {aluno.pessoa.cpf}</StatLabel>
+                                    <StatLabel>CPF: {formatarCpf(aluno.pessoa.cpf)}</StatLabel>
                                     <StatLabel>Instituição: {aluno.instituicaoEnsino.nome}</StatLabel>
+                                    <StatLabel> Turma: { aluno.turma
+                                        ? `${aluno.turma.codigoTurma} - ${aluno.turma.descricao}`
+                                        : "Não informado"} </StatLabel>
                                     <StatLabel>Data de Ingresso: {formatarData(aluno.dataIngresso)}</StatLabel>
                                     {aluno.dataEgresso && (
                                         <StatLabel>Data de Egresso: {formatarData(aluno.dataEgresso)}</StatLabel>
