@@ -142,7 +142,6 @@ const Alunos: React.FC = () => {
                                 <StatContent>
                                     <StatValue>{aluno.pessoa.nome}</StatValue>
                                     <StatLabel>CPF: {aluno.pessoa.cpf}</StatLabel>
-                                    <StatLabel>Email: {aluno.pessoa.email}</StatLabel>
                                     <StatLabel>Instituição: {aluno.instituicaoEnsino.nome}</StatLabel>
                                     <StatLabel>Data de Ingresso: {formatarData(aluno.dataIngresso)}</StatLabel>
                                     {aluno.dataEgresso && (

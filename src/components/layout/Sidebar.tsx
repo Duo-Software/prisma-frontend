@@ -16,6 +16,7 @@ const Sidebar: React.FC = () => {
     const menuItems = [
         { path: '/', label: 'Home', icon: <FiHome /> },
         { path: '/instituicoes', label: 'Instituições', icon: <FiBookOpen /> },
+        { path: '/turmas', label: 'Turmas', icon: <FiBookOpen /> },
         { path: '/profissionais', label: 'Profissionais', icon: <FiUsers /> },
         { path: '/alunos', label: 'Alunos', icon: <FiUsers /> },
         { path: '/formularios', label: 'Formulários', icon: <FiDatabase /> },

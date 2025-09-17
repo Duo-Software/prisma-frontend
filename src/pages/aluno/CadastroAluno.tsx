@@ -32,6 +32,7 @@ import {Etnia} from "../../mocks/etnia.ts";
 import { buscarDiagnosticoPorPessoa, atualizarDiagnostico, cadastrarDiagnostico } from '../../services/diagnosticoPessoaService.ts';
 import AvaliacaoAlunoModal from '../../components/modal/AvaliacaoAlunoModal';
 import { recuperaArquivoById } from '../../services/arquivoService';
+import { buscarTurmas, type Turma } from "../../services/turmaService";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -55,16 +56,10 @@ const initialPessoaState: Pessoa = {
   nome: "",
   cpf: "",
   sexo: "",
-  etnia: "",
   dataNascimento: "",
-  paisNaturalidade: { id: "", nome: "" },
-  ufNaturalidade: { id: "", sigla: "", nome: "" },
-  municipioNaturalidade: { id: "", nome: "", uf: "" },
-  nomeMae: "",
-  nomePai: "",
-  endereco: "",
-  email: "",
-  telefone: "",
+  paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+  ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
+  municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" },
   dataCadastro: "",
   dataAlteracao: ""
 };
@@ -74,6 +69,7 @@ interface alunoPayloadDef {
     pessoa: Pessoa,
     instituicaoNome: string,
     instituicaoId: number | undefined | string,
+    turmaId: ""
     status: string,
     dataIngresso: string,
     dataEgresso: string
@@ -84,6 +80,7 @@ const initialFormState: alunoPayloadDef = {
     pessoa: initialPessoaState,
     instituicaoNome: "",
     instituicaoId: undefined,
+    turmaId: undefined,
     status: StatusAluno.MATRICULADO,
     dataIngresso: "",
     dataEgresso: ""
@@ -106,6 +103,8 @@ export const CadastroAluno: React.FC = () => {
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
+    const [turmas, setTurmas] = useState<Turma[]>([]);
+    const [turmasFiltradas, setTurmasFiltradas] = useState<Turma[]>([]);
 
     // Efeito para carregar dados do aluno se estiver editando
     useEffect(() => {
@@ -124,21 +123,13 @@ export const CadastroAluno: React.FC = () => {
                     nome: pessoaData.nome || "",
                     cpf: pessoaData.cpf || "",
                     sexo: pessoaData.sexo || "",
-                    etnia: pessoaData.etnia || "",
                     dataNascimento: pessoaData.dataNascimento || "",
-                    paisNaturalidade: pessoaData.paisNaturalidade || { id: "", nome: "" },
-                    ufNaturalidade: pessoaData.ufNaturalidade || { id: "", sigla: "", nome: "" },
-                    municipioNaturalidade: pessoaData.municipioNaturalidade || { id: "", nome: "", uf: "" },
-                    nomeMae: pessoaData.nomeMae || "",
-                    nomePai: pessoaData.nomePai || "",
-                    endereco: pessoaData.endereco || "",
-                    email: pessoaData.email || "",
-                    telefone: pessoaData.telefone || "",
                     dataCadastro: pessoaData.dataCadastro || "",
                     dataAlteracao: pessoaData.dataAlteracao || ""
                 },
                 instituicaoNome: alunoData.instituicaoEnsino?.nome || "",
                 instituicaoId: alunoData.instituicaoEnsino?.id || undefined || "",
+                turmaId: alunoData.turma?.id?.toString() || "", 
                 status: alunoData.status || "",
                 dataIngresso: alunoData.dataIngresso ? alunoData.dataIngresso.split('T')[0] : "",
                 dataEgresso: alunoData.dataEgresso ? alunoData.dataEgresso.split('T')[0] : ""
@@ -171,6 +162,12 @@ export const CadastroAluno: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pessoaEncontrada, form.pessoa.id]);
 
+    useEffect(() => {
+        buscarTurmas()
+            .then(setTurmas)
+            .catch(() => alert("Erro ao carregar turmas!"));
+    }, []);
+
     // Função para buscar pessoa e aluno por CPF
     const buscarPessoa = async () => {
         if (!cpfSearch || cpfSearch.length < 11) return;
@@ -183,10 +180,7 @@ export const CadastroAluno: React.FC = () => {
             const resultadoAluno = await buscarAlunoPorCpf(cpfSearch);
 
             if (resultadoAluno.encontrado && resultadoAluno.aluno) {
-                // Aluno já existe no sistema
                 const alunoEncontrado = resultadoAluno.aluno;
-
-                // Redirecionar para edição com os dados do aluno
                 if (!isEditing) {
                     setAlunoExistente(true);
                     setForm({
@@ -194,6 +188,7 @@ export const CadastroAluno: React.FC = () => {
                         pessoa: alunoEncontrado.pessoa,
                         instituicaoNome: alunoEncontrado.instituicaoEnsino?.nome || "",
                         instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id : "",
+                        turmaId: alunoEncontrado.turma?.id?.toString() || "",
                         status: alunoEncontrado.status,
                         dataIngresso: alunoEncontrado.dataIngresso.split('T')[0],
                         dataEgresso: alunoEncontrado.dataEgresso ? alunoEncontrado.dataEgresso.split('T')[0] : ""
@@ -256,9 +251,16 @@ export const CadastroAluno: React.FC = () => {
         setForm(prev => ({
             ...prev,
             instituicaoId: instituicao.id,
-            instituicaoNome: instituicao.nome
+            instituicaoNome: instituicao.nome,
+            turmaId: "" // limpa a turma se alterar a instituição
         }));
+    
+        // Filtrar turmas para esta instituição
+        setTurmasFiltradas(
+            turmas.filter(t => t.instituicaoEnsino.id === instituicao.id)
+        );
     }
+
 
     // Função para salvar os dados da pessoa do modal
     function handleSavePessoa(pessoaData: Pessoa) {
@@ -290,12 +292,23 @@ export const CadastroAluno: React.FC = () => {
         // Preparar objeto a ser enviado para a API
         const alunoPayload: Aluno = {
             id: form.id,
-            pessoa: form.pessoa,
+            pessoa: {
+                id: form.pessoa.id,
+                nome: form.pessoa.nome,
+                cpf: form.pessoa.cpf,
+                sexo: form.pessoa.sexo,
+                dataNascimento: form.pessoa.dataNascimento,
+                dataCadastro: "",
+                dataAlteracao: "",
+                paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+                ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
+                municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
+            },
             instituicaoEnsino: {
                 id: form.instituicaoId,
                 nome: form.instituicaoNome,
-                sigla: "", // Será preenchido pelo backend
-                tipoInstituicaoEnsino: "", // Será preenchido pelo backend
+                sigla: "", // Preenchido pelo backend
+                tipoInstituicaoEnsino: "",
                 municipio: {
                     id: 0,
                     nome: "",
@@ -313,12 +326,14 @@ export const CadastroAluno: React.FC = () => {
                 },
                 ativo: true
             },
+            turma: form.turmaId ? { id: Number(form.turmaId) } : undefined,
             status: form.status as StatusAluno,
             dataIngresso: new Date(form.dataIngresso).toISOString(),
             dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
             dataCadastro: "", // Será preenchido pelo backend
             dataAlteracao: "" // Será preenchido pelo backend
         };
+
 
         console.log(alunoPayload);
 
@@ -422,10 +437,15 @@ export const CadastroAluno: React.FC = () => {
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                                     <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
                                     <StatLabel>CPF: <span>{form.pessoa.cpf}</span></StatLabel>
-                                    <StatLabel>Data de Nascimento: <span>{form.pessoa.dataNascimento}</span></StatLabel>
+                                    <StatLabel>
+                                        Data de Nascimento:{" "}
+                                        <span>
+                                            {form.pessoa.dataNascimento ? new Date(form.pessoa.dataNascimento).toLocaleDateString("pt-BR") : ""}
+                                        </span>
+                                    </StatLabel>
                                     <StatLabel>Sexo: <span>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</span></StatLabel>
-                                    <StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>
-                                    <StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>
+                                    {/*<StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>*/}
+                                    {/*<StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>*/}
                                 </div>
                                 <div style={{ textAlign: "right", marginTop: 10 }}>
                                     <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
@@ -459,6 +479,31 @@ export const CadastroAluno: React.FC = () => {
                                         required
                                         disabled={submitted}
                                     />
+                                </StatLabel>
+                                
+                                <StatLabel>
+                                    Turma:
+                                    <select
+                                        name="turmaId"
+                                        value={form.turmaId}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={submitted || !form.instituicaoId}
+                                        style={{
+                                            width: "80%",
+                                            padding: 8,
+                                            marginTop: 4,
+                                            marginBottom: 4,
+                                            display: "block"
+                                        }}
+                                    >
+                                        <option value="">Selecione...</option>
+                                        {turmasFiltradas.map(t => (
+                                            <option key={t.id} value={t.id}>
+                                                {t.codigoTurma} - {t.descricao}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </StatLabel>
 
                                 <StatLabel>
@@ -623,10 +668,22 @@ export const CadastroAluno: React.FC = () => {
                                             // Preparar objeto aluno
                                             const alunoPayload: Aluno = {
                                                 id: form.id,
-                                                pessoa: form.pessoa,
+                                                pessoa: {
+                                                    id: form.pessoa.id,
+                                                    nome: form.pessoa.nome,
+                                                    cpf: form.pessoa.cpf,
+                                                    sexo: form.pessoa.sexo,
+                                                    dataNascimento: form.pessoa.dataNascimento,
+                                                    dataCadastro: "",
+                                                    dataAlteracao: "",
+                                                    paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+                                                    ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
+                                                    municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
+                                                },
                                                 instituicaoEnsino: {
                                                     id: form.instituicaoId
                                                 },
+                                                turma: form.turmaId ? { id: Number(form.turmaId) } : undefined,
                                                 status: form.status as StatusAluno,
                                                 dataIngresso: new Date(form.dataIngresso).toISOString(),
                                                 dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,

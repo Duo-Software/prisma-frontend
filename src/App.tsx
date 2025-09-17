@@ -5,6 +5,8 @@ import GlobalStyles from './styles/GlobalStyles.ts';
 import { darkTheme } from './styles/theme';
 import Instituicoes from "./pages/intituicao/Instituicoes.tsx";
 import CadastroInstituicao from "./pages/intituicao/CadastroInstituicao.tsx";
+import Turmas from "./pages/turmas/Turmas";
+import CadastroTurma from "./pages/turmas/CadastroTurma";
 import Profissionais from "./pages/profissional/Profissionais.tsx";
 import CadastroProfissional from "./pages/profissional/CadastroProfissional.tsx";
 import Login from "./pages/logon/login.tsx";
@@ -40,6 +42,8 @@ function App() {
                                     <Route path="/settings" element={<div>Página de Configurações</div>} />
                                     <Route path="/instituicoes" element={<Instituicoes />} />
                                     <Route path="/instituicoes/cadastro-instituicao" element={<CadastroInstituicao />} />
+                                    <Route path="/turmas" element={<Turmas />} />
+                                    <Route path="/turmas/cadastro-turma" element={<CadastroTurma />} />
                                     <Route path="/profissionais" element={<Profissionais />} />
                                     <Route path="/profissionais/cadastro-profissional" element={<CadastroProfissional />} />
                                     <Route path="/alunos" element={<Alunos />} />
