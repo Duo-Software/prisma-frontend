@@ -16,7 +16,7 @@ import { useSidebar } from "../../context/SidebarContext.tsx";
 import { useTheme } from "styled-components";
 import { FiEdit, FiPlus } from "react-icons/fi";
 import { StatusAluno } from "../../mocks/status-aluno.ts";
-import { listarTodos } from "../../services/alunoService";
+import {listarByFilter} from "../../services/alunoService";
 import type {Aluno} from "../../types/aluno.ts";
 
 const Alunos: React.FC = () => {
@@ -30,7 +30,7 @@ const Alunos: React.FC = () => {
     useEffect(() => {
         const fetchAlunos = async () => {
             try {
-                const data = await listarTodos();
+                const data = await listarByFilter(undefined);
                 setAlunos(data);
             } catch (error) {
                 console.error('Erro ao carregar alunos:', error);

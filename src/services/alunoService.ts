@@ -64,7 +64,7 @@ export const listarTodos = async (): Promise<Aluno[]> => {
   return response.data;
 };
 
-export const listarByFilter = async (instituicaoId: number): Promise<Aluno[]> => {
+export const listarByFilter = async (instituicaoId: number | undefined): Promise<Aluno[]> => {
   const alunoFilter: AlunoFilter = {
     instituicaoEnsino: instituicaoId,
     status: undefined
