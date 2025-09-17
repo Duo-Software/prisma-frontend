@@ -57,7 +57,7 @@ const initialPessoaState: Pessoa = {
   cpf: "",
   sexo: "",
   dataNascimento: "",
-  paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+  paisNaturalidade: { id: 1, nome: "Brasil" },
   ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
   municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" },
   dataCadastro: "",
@@ -69,7 +69,7 @@ interface alunoPayloadDef {
     pessoa: Pessoa,
     instituicaoNome: string,
     instituicaoId: number | undefined | string,
-    turmaId: ""
+    turmaId: string | undefined,
     status: string,
     dataIngresso: string,
     dataEgresso: string
@@ -257,7 +257,7 @@ export const CadastroAluno: React.FC = () => {
     
         // Filtrar turmas para esta instituição
         setTurmasFiltradas(
-            turmas.filter(t => t.instituicaoEnsino.id === instituicao.id)
+            turmas.filter(t => t?.instituicaoEnsino?.id === instituicao?.id)
         );
     }
 
@@ -289,6 +289,8 @@ export const CadastroAluno: React.FC = () => {
 
         setSubmitted(true);
 
+        const turmaCad: Turma | undefined = turmas.find(t => t.id === Number(form.turmaId));
+
         // Preparar objeto a ser enviado para a API
         const alunoPayload: Aluno = {
             id: form.id,
@@ -300,7 +302,7 @@ export const CadastroAluno: React.FC = () => {
                 dataNascimento: form.pessoa.dataNascimento,
                 dataCadastro: "",
                 dataAlteracao: "",
-                paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+                paisNaturalidade: { id: 1, nome: "Brasil" },
                 ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
                 municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
             },
@@ -326,7 +328,7 @@ export const CadastroAluno: React.FC = () => {
                 },
                 ativo: true
             },
-            turma: form.turmaId ? { id: Number(form.turmaId) } : undefined,
+            turma: turmaCad,
             status: form.status as StatusAluno,
             dataIngresso: new Date(form.dataIngresso).toISOString(),
             dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
@@ -664,6 +666,9 @@ export const CadastroAluno: React.FC = () => {
                                             const etniaEnumValue = Object.entries(Etnia).find(([enumValue]) =>
                                                 enumValue === form.pessoa.etnia
                                             )?.[1] || "";
+
+                                            const turmaCad: Turma | undefined = turmas.find(t => t.id === Number(form.turmaId));
+
                                             form.pessoa.etnia = etniaEnumValue;
                                             // Preparar objeto aluno
                                             const alunoPayload: Aluno = {
@@ -676,14 +681,14 @@ export const CadastroAluno: React.FC = () => {
                                                     dataNascimento: form.pessoa.dataNascimento,
                                                     dataCadastro: "",
                                                     dataAlteracao: "",
-                                                    paisNaturalidade: { id: 1, nome: "Brasil", sigla: "BR" },
+                                                    paisNaturalidade: { id: 1, nome: "Brasil" },
                                                     ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
                                                     municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
                                                 },
                                                 instituicaoEnsino: {
                                                     id: form.instituicaoId
                                                 },
-                                                turma: form.turmaId ? { id: Number(form.turmaId) } : undefined,
+                                                turma: turmaCad,
                                                 status: form.status as StatusAluno,
                                                 dataIngresso: new Date(form.dataIngresso).toISOString(),
                                                 dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,

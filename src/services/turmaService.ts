@@ -1,23 +1,17 @@
 import axios from "axios";
+import type {Instituicao} from "./instituicaoService.ts";
+import type {Profissional} from "./profissionalService.ts";
 
 // DTO conforme backend
 export interface Turma {
-    id: number;
+    id: number | undefined;
     codigoTurma: string;
     descricao: string;
-    turno: string; // ou use enum: "MANHA" | "TARDE" | "NOITE" | etc.
+    turno: string;
+    serie: string;
     anoTurma: number;
-    instituicaoEnsino: {
-        id: number;
-        nome: string;
-        sigla: string;
-        // adicione outros campos se necessário
-    };
-    profissional: {
-        id: number;
-        nome: string;
-        // adicione outros campos se necessário
-    } | null;
+    instituicaoEnsino: Instituicao | undefined;
+    profissional: Profissional | undefined;
     ativo: boolean;
 }
 
@@ -61,7 +55,7 @@ export const criarTurma = async (turma: TurmaCreate): Promise<Turma> => {
 };
 
 // Atualizar turma
-export const atualizarTurma = async (id: number, turma: Partial<Turma>): Promise<Turma> => {
+export const atualizarTurma = async (id: number | undefined, turma: Partial<Turma>): Promise<Turma> => {
     try {
         const response = await axios.put<Turma>(`${API_URL}/turmas/${id}`, turma);
         return response.data;

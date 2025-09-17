@@ -17,9 +17,20 @@ import { criarTurma, atualizarTurma, type Turma } from "../../services/turmaServ
 import { profissionalService, type Profissional } from "../../services/profissionalService";
 import { InputPadrao } from "../../components/layout/InputPadrao.tsx";
 
+interface TurmaFormState {
+    id: number | undefined;
+    codigoTurma: string;
+    descricao: string;
+    serie: string;
+    turno: string;
+    anoTurma: string;
+    instituicaoEnsinoId: string;
+    profissionalId: string;
+    ativo: boolean;
+}
 
-const initialFormState = {
-    id: 0,
+const initialFormState: TurmaFormState = {
+    id: undefined,
     codigoTurma: "",
     descricao: "",
     serie: "",
@@ -80,7 +91,7 @@ const CadastroTurma: React.FC = () => {
         if (location.state) {
             const turmaState: Turma = location.state;
             setForm({
-                id: turmaState.id,
+                id: turmaState?.id ?? undefined,
                 codigoTurma: turmaState.codigoTurma || "",
                 descricao: turmaState.descricao || "",
                 serie: turmaState.serie || "",
@@ -95,7 +106,7 @@ const CadastroTurma: React.FC = () => {
     }, [location.state]);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        const { name, value, type } = e.target;
+        const { name, value } = e.target;
 
         if (name === "descricao") {
             setForm(prev => ({ ...prev, descricao: value.toUpperCase() }));
@@ -117,14 +128,15 @@ const CadastroTurma: React.FC = () => {
         e.preventDefault();
         setSubmitted(true);
 
-        const payload = {
+        const payload: Turma = {
+            id: undefined,
             codigoTurma: form.codigoTurma,
             descricao: form.descricao,
             serie: form.serie,
             turno: form.turno,
             anoTurma: Number(form.anoTurma),
             instituicaoEnsino: instituicoes.find(inst => inst.id.toString() === form.instituicaoEnsinoId),
-            profissional: form.profissionalId ? profissionais.find(p => p.id.toString() === form.profissionalId) : null,
+            profissional: form.profissionalId ? profissionais.find(p => p.id.toString() === form.profissionalId) : undefined,
 
             ativo: true // sempre true
         };

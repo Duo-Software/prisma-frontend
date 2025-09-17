@@ -125,7 +125,7 @@ const Turmas: React.FC = () => {
                                     <strong>Instituição:</strong> {turma.instituicaoEnsino?.nome ?? "-"}
                                 </StatLabel>
                                 <StatLabel>
-                                    <strong>Professor:</strong> {turma.profissional?.nome ?? "-"}
+                                    <strong>Professor:</strong> {turma.profissional?.pessoa?.nome ?? "-"}
                                 </StatLabel>
                                 <StatLabel>
                                   <strong>Série:</strong> {turma.serie}

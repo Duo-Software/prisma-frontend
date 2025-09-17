@@ -151,7 +151,7 @@ const Alunos: React.FC = () => {
                                     <StatLabel>CPF: {formatarCpf(aluno.pessoa.cpf)}</StatLabel>
                                     <StatLabel>Instituição: {aluno.instituicaoEnsino.nome}</StatLabel>
                                     <StatLabel> Turma: { aluno.turma
-                                        ? `${aluno.turma.codigoTurma} - ${aluno.turma.descricao}`
+                                        ? `${aluno.turma?.codigoTurma} - ${aluno.turma?.descricao}`
                                         : "Não informado"} </StatLabel>
                                     <StatLabel>Data de Ingresso: {formatarData(aluno.dataIngresso)}</StatLabel>
                                     {aluno.dataEgresso && (

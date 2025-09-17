@@ -1,10 +1,12 @@
 import type {Pessoa} from "../services/pessoaService";
 import { StatusAluno } from "../mocks/status-aluno";
+import type {Turma} from "../services/turmaService.ts";
 
 export interface Aluno {
   id?: number;
   matricula?: string;
   pessoa: Pessoa;
+  turma?: Turma | undefined;
   instituicaoEnsino: {
     id: number | string | undefined;
     nome?: string;
