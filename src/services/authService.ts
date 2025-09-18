@@ -34,7 +34,7 @@ export const authService = {
             });
             return true;
         } catch (error) {
-            this.logout();
+            if (axios.isAxiosError(error) && error.response?.status === 401) this.logout();
             return false;
         }
     },
@@ -51,5 +51,6 @@ export const authService = {
     logout() {
         localStorage.removeItem('token');
         delete axios.defaults.headers.common['Authorization'];
+        window.location.href = '/login';
     }
 };
