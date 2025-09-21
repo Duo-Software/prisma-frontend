@@ -100,6 +100,7 @@ interface Pessoa {
     telefone: string;
     dataCadastro: string;
     dataAlteracao: string;
+    statusNecessidade: string;
 }
 
 interface PessoaModalProps {
@@ -125,7 +126,8 @@ const initialPessoaState: Pessoa = {
     email: "",
     telefone: "",
     dataCadastro: "",
-    dataAlteracao: ""
+    dataAlteracao: "",
+    statusNecessidade: "NAO_INFORMADO"
 };
 
 function formatarCpf(cpf: string): string {

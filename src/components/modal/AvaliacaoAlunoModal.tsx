@@ -1,9 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Modal from './Modal';
 import {InputPadrao} from '../layout/InputPadrao';
-import {ButtonStyled, StatLabel} from '../layout/DefaultComponents';
-import {CustomSelect} from "../layout/CustomSelect.tsx";
-import {useTheme} from "styled-components";
+import {ButtonStyled} from '../layout/DefaultComponents';
 
 interface Arquivo {
     idArquivo?: number;
@@ -20,7 +18,6 @@ export interface AvaliacaoAluno {
     idPessoa: number;
     nomePessoa?: string;
     cid: string;
-    status: string;
     parecer: string;
     idProfissionalResponsavel: number;
     nomeProfissionalResponsavel?: string;
@@ -39,7 +36,6 @@ const initialAvaliacaoState: AvaliacaoAluno = {
     idDiagnosticoPessoa: undefined,
     idPessoa: 0,
     cid: '',
-    status: '',
     parecer: '',
     idProfissionalResponsavel: 0,
     arquivo: undefined
@@ -54,7 +50,6 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
                                                                  }) => {
     const [avaliacao, setAvaliacao] = useState<AvaliacaoAluno>(initialAvaliacaoState);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const theme = useTheme();
 
     useEffect(() => {
         if (initialData) {
@@ -121,24 +116,7 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
                         required
                     />
                 </label>
-                <StatLabel>
-                    Status:
-                    <CustomSelect
-                        name="status"
-                        value={avaliacao.status}
-                        onChange={handleChange}
-                        options={[
-                            {value: "", label: "Selecione o status"},
-                            {value: "SEM_AVALIACAO", label: "Sem Avaliação"},
-                            {value: "EM_ANALISE", label: "Em Análise"},
-                            {value: "LAUDADO", label: "Laudado"}
-                        ]}
-                        required
-                        disabled={isSubmitting}
-                        textColor={theme.colors.textSecondary}
-                        selectedTextColor={theme.colors.primaryLight}
-                    />
-                </StatLabel>
+
 
                 <label>
                     Parecer:

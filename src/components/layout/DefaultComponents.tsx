@@ -88,6 +88,7 @@ export const Card = styled.div`
 
 export const CardFixed = styled.div`
     cursor: pointer;
+    text-color: ${props => props.theme.colors.primaryLight};
     background-color: ${props => props.theme.colors.surface};
     border-radius: ${props => props.theme.borderRadius};
     padding: 1.25rem;
@@ -169,9 +170,14 @@ export const StatValue = styled.div`
   color: ${props => props.theme.colors.text};
 `;
 
+export const StatValueContent = styled.span`
+  font-size: 1rem;
+  color: ${props => props.theme.colors.text};
+`;
+
 export const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: 1rem;
+  color: ${props => props.theme.colors.primaryLight};
 `;
 
 export const StatFooter = styled.div`

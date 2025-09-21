@@ -17,6 +17,7 @@ export interface Pessoa {
   telefone?: string;
   dataCadastro?: string;
   dataAlteracao?: string;
+  statusNecessidade: string;
 }
 
 export interface PessoaResult {
@@ -48,7 +49,8 @@ export const buscarPessoaPorCpf = (cpf: string): Promise<PessoaResult> => {
           pessoa: {
             id: "",
             nome: "",
-            cpf: formatarCpf(cpf)
+            cpf: formatarCpf(cpf),
+            statusNecessidade: "NAO_INFORMADO"
           },
           encontrado: false
         });

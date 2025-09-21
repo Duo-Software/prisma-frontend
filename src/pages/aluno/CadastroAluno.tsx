@@ -13,8 +13,8 @@ import {
     FixedHeader,
     ButtonStyled,
     CardWrapper,
-    CardFixed, 
-    CardGrid
+    CardFixed,
+    CardGrid, StatValueContent
 } from "../../components/layout/DefaultComponents.tsx";
 import { useSidebar } from "../../context/SidebarContext.tsx";
 import { useTheme } from "styled-components";
@@ -33,6 +33,7 @@ import { buscarDiagnosticoPorPessoa, atualizarDiagnostico, cadastrarDiagnostico 
 import AvaliacaoAlunoModal from '../../components/modal/AvaliacaoAlunoModal';
 import { recuperaArquivoById } from '../../services/arquivoService';
 import { buscarTurmas, type Turma } from "../../services/turmaService";
+import {FiPlus} from "react-icons/fi";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -61,7 +62,8 @@ const initialPessoaState: Pessoa = {
   ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
   municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" },
   dataCadastro: "",
-  dataAlteracao: ""
+  dataAlteracao: "",
+  statusNecessidade: "NAO_INFORMADO"
 };
 
 interface alunoPayloadDef {
@@ -104,7 +106,7 @@ export const CadastroAluno: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [turmas, setTurmas] = useState<Turma[]>([]);
-    const [turmasFiltradas, setTurmasFiltradas] = useState<Turma[]>([]);
+    const [turmasFiltradas, setTurmasFiltradas] = useState<Turma[]>([])
 
     // Efeito para carregar dados do aluno se estiver editando
     useEffect(() => {
@@ -125,7 +127,8 @@ export const CadastroAluno: React.FC = () => {
                     sexo: pessoaData.sexo || "",
                     dataNascimento: pessoaData.dataNascimento || "",
                     dataCadastro: pessoaData.dataCadastro || "",
-                    dataAlteracao: pessoaData.dataAlteracao || ""
+                    dataAlteracao: pessoaData.dataAlteracao || "",
+                    statusNecessidade: pessoaData.statusNecessidade || "NAO_INFORMADO"
                 },
                 instituicaoNome: alunoData.instituicaoEnsino?.nome || "",
                 instituicaoId: alunoData.instituicaoEnsino?.id || undefined || "",
@@ -247,6 +250,17 @@ export const CadastroAluno: React.FC = () => {
         }));
     }
 
+    function handleChangeStatusNecessidade(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { value } = e.target;
+        setForm(prev => ({
+            ...prev,
+            pessoa: {
+                ...prev.pessoa,
+                statusNecessidade: value
+            }
+        }));
+    }
+
     function handleInstituicaoSelect(instituicao: any) {
         setForm(prev => ({
             ...prev,
@@ -304,7 +318,8 @@ export const CadastroAluno: React.FC = () => {
                 dataAlteracao: "",
                 paisNaturalidade: { id: 1, nome: "Brasil" },
                 ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
-                municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
+                municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" },
+                statusNecessidade: form.pessoa.statusNecessidade
             },
             instituicaoEnsino: {
                 id: form.instituicaoId,
@@ -435,19 +450,19 @@ export const CadastroAluno: React.FC = () => {
 
                         {pessoaEncontrada ? (
                             <CardFixed style={{ padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center" }}>
-                                <h3 style={{ marginTop: 0 }}>Dados Pessoais</h3>
+                                <h3 style={{ marginTop: 0, color: theme.colors.primary }}>Dados Pessoais</h3>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                                    <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
-                                    <StatLabel>CPF: <span>{form.pessoa.cpf}</span></StatLabel>
+                                    <StatLabel>Nome: <StatValueContent style={{ color: theme.colors.textSecondary }}>{form.pessoa.nome}</StatValueContent></StatLabel>
+                                    <StatLabel>CPF: <StatValueContent>{form.pessoa.cpf}</StatValueContent></StatLabel>
                                     <StatLabel>
                                         Data de Nascimento:{" "}
-                                        <span>
+                                        <StatValueContent>
                                             {form.pessoa.dataNascimento ? new Date(form.pessoa.dataNascimento).toLocaleDateString("pt-BR") : ""}
-                                        </span>
+                                        </StatValueContent>
                                     </StatLabel>
-                                    <StatLabel>Sexo: <span>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</span></StatLabel>
-                                    {/*<StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>*/}
-                                    {/*<StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>*/}
+                                    <StatLabel>Sexo: <StatValueContent>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</StatValueContent></StatLabel>
+                                    {/*<StatLabel>Email: <StatValueContent>{form.pessoa.email}</StatValueContent></StatLabel>*/}
+                                    {/*<StatLabel>Telefone: <StatValueContent>{form.pessoa.telefone}</StatValueContent></StatLabel>*/}
                                 </div>
                                 <div style={{ textAlign: "right", marginTop: 10 }}>
                                     <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
@@ -468,7 +483,7 @@ export const CadastroAluno: React.FC = () => {
 
                         {pessoaEncontrada && (
                             <CardGrid style={{ padding: 20, minWidth: 450, marginBottom: 20 }}>
-                                <h3>Dados Acadêmicos</h3>
+                                <h3 style={{ textAlign: 'center', color: theme.colors.primary }}>Dados Acadêmicos</h3>
                                 <h3></h3>
 
                                 <StatLabel>
@@ -485,27 +500,17 @@ export const CadastroAluno: React.FC = () => {
                                 
                                 <StatLabel>
                                     Turma:
-                                    <select
+                                    <CustomSelect
                                         name="turmaId"
-                                        value={form.turmaId}
+                                        value={form.turmaId?.toString() || ''}
                                         onChange={handleChange}
                                         required
                                         disabled={submitted || !form.instituicaoId}
-                                        style={{
-                                            width: "80%",
-                                            padding: 8,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                            display: "block"
-                                        }}
-                                    >
-                                        <option value="">Selecione...</option>
-                                        {turmasFiltradas.map(t => (
-                                            <option key={t.id} value={t.id}>
-                                                {t.codigoTurma} - {t.descricao}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={turmasFiltradas.map(t => ({
+                                            value: t.id?.toString() || '',
+                                            label: `${t.codigoTurma} - ${t.descricao}`
+                                        }))}
+                                    />
                                 </StatLabel>
 
                                 <StatLabel>
@@ -552,68 +557,148 @@ export const CadastroAluno: React.FC = () => {
 
                         {/* Seção Avaliação do Aluno */}
                         {pessoaEncontrada && (
-                            <CardGrid style={{ padding: 20, minWidth: 450, marginBottom: 20  }}>
-                                <h3 style={{ marginTop: 0 }}>Avaliação do Aluno</h3>
-                                <div style={{ textAlign: 'right', marginBottom: 10 }}>
-                                    {avaliacaoAluno ? (
-                                        <ButtonStyled type="button" onClick={() => {
-                                            setAvaliacaoEdit(avaliacaoAluno);
-                                            setIsModalAvaliacaoOpen(true);
-                                        }} style={{ padding: '4px 16px', fontSize: 14 }}>
-                                            Editar
+                            <CardFixed>
+                                <h3 style={{ textAlign: 'center', color: theme.colors.primary }}>Diagnóstico do Aluno</h3>
+                                <h4 style={{ marginTop: 0, color: theme.colors.primaryLight }}>Possui alguma necessidade?</h4>
+                                    <CustomSelect
+                                        name="status_necessidade"
+                                        value={form.pessoa.statusNecessidade}
+                                        onChange={handleChangeStatusNecessidade}
+                                        options={[
+                                            {value: "NAO_INFORMADO", label: "SELECIONE"},
+                                            {value: "NAO", label: "NÃO"},
+                                            {value: "EM_PROCESSO_DIAGNISTICO", label: "EM PROCESSO DE DIAGNÓSTICO"},
+                                            {value: "SIM", label: "SIM"}
+                                        ]}
+                                        required
+                                        disabled={submitted}
+                                        textColor={theme.colors.textSecondary}
+                                        selectedTextColor={theme.colors.textSecondary}
+                                    />
+                                <span style={{ textAlign: 'right', marginBottom: 10 }}>
+                                    {form.pessoa.statusNecessidade === 'SIM' ? (
+                                        <ButtonStyled
+                                            onClick={() => {
+                                                setAvaliacaoEdit({
+                                                    idDiagnosticoPessoa: 0,
+                                                    idPessoa: form.pessoa.id,
+                                                    cid: '',
+                                                    status: '',
+                                                    parecer: '',
+                                                    idProfissionalResponsavel: 0,
+                                                    arquivo: undefined
+                                                });
+                                                setIsModalAvaliacaoOpen(true);
+                                            }}
+                                            title="Cadastrar"
+                                            style={{ padding: '4px 16px', fontSize: 14 }}
+                                        >
+                                            <FiPlus size={24} />
                                         </ButtonStyled>
-                                    ) : (
-                                        <ButtonStyled type="button" onClick={() => {
-                                            setAvaliacaoEdit({
-                                                idDiagnosticoPessoa: 0,
-                                                idPessoa: form.pessoa.id,
-                                                cid: '',
-                                                status: '',
-                                                parecer: '',
-                                                idProfissionalResponsavel: 0,
-                                                arquivo: undefined
-                                            });
-                                            setIsModalAvaliacaoOpen(true);
-                                        }} style={{ padding: '4px 16px', fontSize: 14 }}>
-                                            Cadastrar
-                                        </ButtonStyled>
-                                    )}
-                                </div>
+                                    ):''}
+                                </span>
                                 {avaliacaoAluno ? (
-                                    <>
-                                        <StatLabel>
-                                            CID: <span>{avaliacaoAluno.cid}</span>
-                                        </StatLabel>
-                                        <StatLabel>
-                                            Status: <span>{avaliacaoAluno.status}</span>
-                                        </StatLabel>
-                                        <StatLabel>
-                                            Parecer: <span>{avaliacaoAluno.parecer}</span>
-                                        </StatLabel>
-                                        <StatLabel>
-                                            Profissional Responsável: <span>{avaliacaoAluno.nomeProfissionalResponsavel}</span>
-                                        </StatLabel>
-                                        <StatLabel>
-                                            Arquivo: {avaliacaoAluno.arquivo && avaliacaoAluno.arquivo.idArquivo ? (
-                                                <a
-                                                    href="#"
-                                                    style={{ color: theme.colors.primary }}
-                                                    onClick={e => {
-                                                        e.preventDefault();
-                                                        handleDownloadArquivo();
-                                                    }}
-                                                >
-                                                    {avaliacaoAluno.arquivo.nome}
-                                                </a>
-                                            ) : (
-                                                <span>Não informado</span>
-                                            )}
-                                        </StatLabel>
-                                    </>
+                                    <div style={{ width: '100%' }}>
+                                        <table style={{ 
+                                            width: '100%', 
+                                            borderCollapse: 'collapse',
+                                            marginTop: '10px',
+                                            fontSize: '14px',
+                                            color: theme.colors.text,
+                                            borderRadius: theme.borderRadius,
+                                            overflow: 'hidden'
+                                        }}>
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ 
+                                                        padding: '10px 12px', 
+                                                        textAlign: 'left', 
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>CID</th>
+                                                    <th style={{ 
+                                                        padding: '10px 12px', 
+                                                        textAlign: 'left', 
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>Parecer</th>
+                                                    <th style={{ 
+                                                        padding: '10px 12px', 
+                                                        textAlign: 'left', 
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>Profissional Responsável</th>
+                                                    <th style={{ 
+                                                        padding: '10px 12px', 
+                                                        textAlign: 'left', 
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>Arquivo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style={{ 
+                                                        padding: '8px 12px', 
+                                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.surface
+                                                    }}>{avaliacaoAluno.cid}</td>
+                                                    <td style={{ 
+                                                        padding: '8px 12px', 
+                                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.surface
+                                                    }}>{avaliacaoAluno.parecer}</td>
+                                                    <td style={{ 
+                                                        padding: '8px 12px', 
+                                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.surface
+                                                    }}>{avaliacaoAluno.nomeProfissionalResponsavel}</td>
+                                                    <td style={{ 
+                                                        padding: '8px 12px', 
+                                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.surface
+                                                    }}>
+                                                        {avaliacaoAluno.arquivo && avaliacaoAluno.arquivo.idArquivo ? (
+                                                            <a
+                                                                href="#"
+                                                                style={{ 
+                                                                    color: theme.colors.primary,
+                                                                    textDecoration: 'underline',
+                                                                    transition: theme.transition
+                                                                }}
+                                                                onClick={e => {
+                                                                    e.preventDefault();
+                                                                    handleDownloadArquivo();
+                                                                }}
+                                                                onMouseOver={e => {
+                                                                    e.currentTarget.style.color = theme.colors.primaryLight;
+                                                                }}
+                                                                onMouseOut={e => {
+                                                                    e.currentTarget.style.color = theme.colors.primary;
+                                                                }}
+                                                            >
+                                                                {avaliacaoAluno.arquivo.nome}
+                                                            </a>
+                                                        ) : (
+                                                            <StatValueContent style={{ color: theme.colors.textSecondary }}>
+                                                                Não informado
+                                                            </StatValueContent>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 ) : (
-                                    <span>Nenhuma avaliação cadastrada para este aluno.</span>
+                                    <StatValueContent style={{ color: theme.colors.textSecondary }}>
+                                        Nenhuma avaliação cadastrada para este aluno.
+                                    </StatValueContent>
                                 )}
-                            </CardGrid>
+                            </CardFixed>
                         )}
 
                         {/* Modal de edição/cadastro da Avaliação do Aluno */}
@@ -683,7 +768,8 @@ export const CadastroAluno: React.FC = () => {
                                                     dataAlteracao: "",
                                                     paisNaturalidade: { id: 1, nome: "Brasil" },
                                                     ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
-                                                    municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" }
+                                                    municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT"},
+                                                    statusNecessidade: form.pessoa.statusNecessidade
                                                 },
                                                 instituicaoEnsino: {
                                                     id: form.instituicaoId
@@ -727,3 +813,4 @@ export const CadastroAluno: React.FC = () => {
         </>
     );
 };
+

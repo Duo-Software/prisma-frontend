@@ -8,23 +8,26 @@ const SugestoesList = styled.ul`
   width: calc(80% - 2px);
   max-height: 200px;
   overflow-y: auto;
-  background-color: white;
-  border: 1px solid #ccc;
+  background-color: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-top: none;
   list-style: none;
   margin: 0;
   padding: 0;
   z-index: 10;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.boxShadow};
+  border-radius: 0 0 ${({ theme }) => theme.borderRadius} ${({ theme }) => theme.borderRadius};
 `;
 
 const SugestaoItem = styled.li`
   padding: 8px 10px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  color: ${({ theme }) => theme.colors.text};
+  transition: ${({ theme }) => theme.transition};
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.colors.primaryLight};
   }
 
   &:last-child {

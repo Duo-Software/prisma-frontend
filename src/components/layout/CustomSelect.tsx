@@ -14,7 +14,9 @@ const SelectInput = styled.input<{ textColor?: string }>`
   display: block;
   border: 1px solid #ccc;
   border-radius: 4px;
-  color: ${props => props.textColor || 'inherit'};
+  text-color: ${props => props.theme.colors.primaryLight};
+  background-color: ${props => props.theme.colors.background};
+  color: ${props => props.theme.colors.primary || 'inherit'};
 `;
 
 const DropdownList = styled.ul`
@@ -164,7 +166,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         placeholder={placeholder}
         readOnly
         // ... props existentes
-        textColor={textColor}
+        textColor={selectedTextColor}
       />
       <ArrowIcon>▼</ArrowIcon>
       

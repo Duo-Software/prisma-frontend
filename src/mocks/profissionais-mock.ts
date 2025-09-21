@@ -21,7 +21,8 @@ export const mockProfissionais = [
       email: "joao.silva@email.com",
       telefone: "(65) 99988-7777",
       dataCadastro: "2024-01-15T10:30:00",
-      dataAlteracao: "2024-05-15T10:30:00"
+      dataAlteracao: "2024-05-15T10:30:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
     cargo: Cargo.SECRETARIO,
@@ -47,7 +48,8 @@ export const mockProfissionais = [
       email: "maria.oliveira@email.com",
       telefone: "(65) 99977-6666",
       dataCadastro: "2024-01-10T14:20:00",
-      dataAlteracao: "2024-05-12T09:15:00"
+      dataAlteracao: "2024-05-12T09:15:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[1],
     cargo: Cargo.GESTOR,
@@ -61,7 +63,8 @@ export const mockProfissionais = [
       id: 103,
       nome: "Carlos Pereira",
       email: "carlos.pereira@email.com",
-      telefone: "(65) 99966-5555"
+      telefone: "(65) 99966-5555",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[2],
     cargo: Cargo.GESTOR,
@@ -85,7 +88,8 @@ export const mockProfissionais = [
       nomePai: "Pedro Oliveira",
       endereco: "Avenida Central, 456",
       dataCadastro: "2024-01-10T14:20:00",
-      dataAlteracao: "2024-05-12T09:15:00"
+      dataAlteracao: "2024-05-12T09:15:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
     cargo: Cargo.SECRETARIO,
@@ -99,7 +103,8 @@ export const mockProfissionais = [
       id: 105,
       nome: "Roberto Almeida",
       email: "roberto.almeida@email.com",
-      telefone: "(65) 99944-3333"
+      telefone: "(65) 99944-3333",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[3],
     cargo: Cargo.SECRETARIO,
@@ -113,7 +118,8 @@ export const mockProfissionais = [
       id: 106,
       nome: "Patrícia Lima",
       email: "patricia.lima@email.com",
-      telefone: "(65) 99933-2222"
+      telefone: "(65) 99933-2222",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[1],
     cargo: Cargo.SECRETARIO,
@@ -127,7 +133,8 @@ export const mockProfissionais = [
       id: 107,
       nome: "Lucas Ferreira",
       email: "lucas.ferreira@email.com",
-      telefone: "(65) 99922-1111"
+      telefone: "(65) 99922-1111",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[4],
     cargo: Cargo.SECRETARIO,
@@ -141,7 +148,8 @@ export const mockProfissionais = [
       id: 108,
       nome: "Juliana Costa",
       email: "juliana.costa@email.com",
-      telefone: "(65) 99911-0000"
+      telefone: "(65) 99911-0000",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[2],
     cargo: Cargo.SECRETARIO,
@@ -155,7 +163,8 @@ export const mockProfissionais = [
       id: 109,
       nome: "Fernando Souza",
       email: "fernando.souza@email.com",
-      telefone: "(65) 99900-9999"
+      telefone: "(65) 99900-9999",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[5],
     cargo: Cargo.GESTOR,
@@ -169,7 +178,8 @@ export const mockProfissionais = [
       id: 110,
       nome: "Mariana Vieira",
       email: "mariana.vieira@email.com",
-      telefone: "(65) 99888-8888"
+      telefone: "(65) 99888-8888",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
     cargo: Cargo.SECRETARIO,
