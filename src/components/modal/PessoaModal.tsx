@@ -157,6 +157,7 @@ function formatarTelefone(valor: string): string {
 const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, initialData }) => {
     const [pessoa, setPessoa] = useState<Pessoa>(initialPessoaState);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [validationError, setValidationError] = useState<string | null>(null);
 
     useEffect(() => {
         if (initialData) {
@@ -221,16 +222,16 @@ const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, init
         }
     }
 
-  // function handlePaisSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-  //     const selectedValue = e.target.value;
-  //     // No momento só existe a opção Brasil (id = "1")
-  //     setPessoa(prev => ({
-  //         ...prev,
-  //         paisNaturalidade: selectedValue
-  //             ? { id: "1", nome: "Brasil" }
-  //             : { id: "", nome: "" }
-  //     }));
-  // }
+    // function handlePaisSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    //     const selectedValue = e.target.value;
+    //     // No momento só existe a opção Brasil (id = "1")
+    //     setPessoa(prev => ({
+    //         ...prev,
+    //         paisNaturalidade: selectedValue
+    //             ? { id: "1", nome: "Brasil" }
+    //             : { id: "", nome: "" }
+    //     }));
+    // }
 
     // function handleUfSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     //     const ufSigla = e.target.value;
@@ -266,8 +267,31 @@ const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, init
     //     }
     // }
 
+    // Função para checar se todos os campos obrigatórios estão preenchidos
+    function validarCamposObrigatorios(): { val: boolean, erro?: string } {
+        if (!pessoa.nome.trim())
+            return { val: false, erro: 'O nome é obrigatório.' };
+        if (!pessoa.cpf.trim() || pessoa.cpf.replace(/\D/g, '').length < 11)
+            return { val: false, erro: 'Informe um CPF válido.' };
+        if (!pessoa.sexo)
+            return { val: false, erro: 'Selecione o sexo.' };
+        if (!pessoa.dataNascimento)
+            return { val: false, erro: 'Informe a data de nascimento.' };
+        // Inclua aqui outros campos obrigatórios caso desejar!
+        return { val: true };
+    }
+
     const handleSubmit = () => {
         setIsSubmitting(true);
+
+        const validacao = validarCamposObrigatorios();
+        if (!validacao.val) {
+            setValidationError(validacao.erro || 'Preencha todos os campos obrigatórios.');
+            setIsSubmitting(false);
+            return;
+        }
+
+        setValidationError(null);
 
         // Criar uma cópia atualizada para enviar ao parent
         const updatedPessoa = {
@@ -559,7 +583,11 @@ const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, init
                 {/*    </select>*/}
                 {/*</StatLabel>*/}
             </ModalGrid>
-
+            {validationError && (
+                <div style={{ color: '#e53935', marginBottom: 8, marginTop: 12, textAlign: 'center' }}>
+                    {validationError}
+                </div>
+            )}
             <ButtonsContainer>
                 <CancelButton onClick={onClose} disabled={isSubmitting}>Cancelar</CancelButton>
                 <SubmitButton onClick={handleSubmit} disabled={isSubmitting}>

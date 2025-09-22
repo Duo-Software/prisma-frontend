@@ -20,7 +20,7 @@ import { useSidebar } from "../../context/SidebarContext.tsx";
 import { useTheme } from "styled-components";
 import { InputPadrao } from "../../components/layout/InputPadrao.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AutocompleteInstituicao } from "../../components/AutocompleteInstituicao.tsx";
+import { buscarInstituicoes, type Instituicao } from "../../services/instituicaoService.ts";
 import { StatusAluno } from "../../mocks/status-aluno.ts";
 import PessoaModal from "../../components/modal/PessoaModal.tsx";
 import { buscarPessoaPorCpf, type Pessoa, formatarCpf } from "../../services/pessoaService.ts";
@@ -106,6 +106,7 @@ export const CadastroAluno: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [turmas, setTurmas] = useState<Turma[]>([]);
+    const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
     const [turmasFiltradas, setTurmasFiltradas] = useState<Turma[]>([])
 
     // Efeito para carregar dados do aluno se estiver editando
@@ -131,7 +132,7 @@ export const CadastroAluno: React.FC = () => {
                     statusNecessidade: pessoaData.statusNecessidade || "NAO_INFORMADO"
                 },
                 instituicaoNome: alunoData.instituicaoEnsino?.nome || "",
-                instituicaoId: alunoData.instituicaoEnsino?.id || undefined || "",
+                instituicaoId: alunoData.instituicaoEnsino?.id?.toString() || undefined || "",
                 turmaId: alunoData.turma?.id?.toString() || "", 
                 status: alunoData.status || "",
                 dataIngresso: alunoData.dataIngresso ? alunoData.dataIngresso.split('T')[0] : "",
@@ -144,8 +145,30 @@ export const CadastroAluno: React.FC = () => {
             setPessoaEncontrada(true);
             // Preencher o campo de busca de CPF
             setCpfSearch(pessoaData.cpf || "");
+
+            if (alunoData.instituicaoEnsino?.id && turmas.length > 0) {
+                setTurmasFiltradas(
+                    turmas.filter(t => t?.instituicaoEnsino?.id === Number(alunoData.instituicaoEnsino.id))
+                );
+            }
         }
-    }, [location]);
+    }, [location, turmas]);
+
+    useEffect(() => {
+        buscarInstituicoes()
+            .then(setInstituicoes)
+            .catch(() => alert("Erro ao carregar instituições!"));
+    }, []);
+
+    useEffect(() => {
+        if (form.instituicaoId && turmas.length > 0) {
+            setTurmasFiltradas(
+                turmas.filter(t => t?.instituicaoEnsino?.id?.toString() === form.instituicaoId)
+            );
+        } else {
+            setTurmasFiltradas([]);
+        }
+    }, [form.instituicaoId, turmas]);
 
     // Buscar avaliação do aluno ao encontrar pessoa
     useEffect(() => {
@@ -483,33 +506,69 @@ export const CadastroAluno: React.FC = () => {
 
                         {pessoaEncontrada && (
                             <CardGrid style={{ padding: 20, minWidth: 450, marginBottom: 20 }}>
-                                <h3 style={{ textAlign: 'center', color: theme.colors.primary }}>Dados Acadêmicos</h3>
-                                <h3></h3>
+                                <h3
+                                  style={{
+                                    textAlign: 'center',
+                                    color: theme.colors.primary,
+                                    gridColumn: '1 / -1'
+                                  }}
+                                >
+                                  Dados Acadêmicos
+                                </h3>
 
                                 <StatLabel>
                                     Instituição de Ensino:
-                                    <AutocompleteInstituicao
-                                        name="instituicaoNome"
-                                        value={form.instituicaoNome}
-                                        onChange={handleChange}
-                                        onSelect={handleInstituicaoSelect}
+                                    <CustomSelect
+                                        name="instituicaoId"
+                                        value={form.instituicaoId || ""}
+                                        onChange={e => {
+                                            handleChange(e);
+                                            setForm(prev => ({
+                                                ...prev,
+                                                turmaId: ""
+                                            }));
+                                        }}
                                         required
                                         disabled={submitted}
+                                        options={[
+                                            { value: "", label: "Selecione..." },
+                                            ...instituicoes.map(inst => ({
+                                                value: inst.id?.toString() ?? "",
+                                                label: inst.nome
+                                            }))
+                                        ]}
+                                        style={{
+                                            width: "80%",
+                                            padding: 8,
+                                            marginTop: 4,
+                                            marginBottom: 4,
+                                            display: "block"
+                                        }}
                                     />
                                 </StatLabel>
-                                
+
                                 <StatLabel>
                                     Turma:
                                     <CustomSelect
                                         name="turmaId"
-                                        value={form.turmaId?.toString() || ''}
+                                        value={form.turmaId || ""}
                                         onChange={handleChange}
                                         required
                                         disabled={submitted || !form.instituicaoId}
-                                        options={turmasFiltradas.map(t => ({
-                                            value: t.id?.toString() || '',
-                                            label: `${t.codigoTurma} - ${t.descricao}`
-                                        }))}
+                                        options={[
+                                            { value: "", label: "Selecione..." },
+                                            ...turmasFiltradas.map(t => ({
+                                                value: t.id?.toString() ?? "",
+                                                label: `${t.codigoTurma} - ${t.descricao}`
+                                            }))
+                                        ]}
+                                        style={{
+                                            width: "80%",
+                                            padding: 8,
+                                            marginTop: 4,
+                                            marginBottom: 4,
+                                            display: "block"
+                                        }}
                                     />
                                 </StatLabel>
 
@@ -730,6 +789,7 @@ export const CadastroAluno: React.FC = () => {
                             isOpen={isModalOpen}
                             onClose={() => setIsModalOpen(false)}
                             onSave={handleSavePessoa}
+                            initialData={form.pessoa}
                         />
 
                         {pessoaEncontrada && (

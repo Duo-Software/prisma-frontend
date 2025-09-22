@@ -87,23 +87,26 @@ const CadastroTurma: React.FC = () => {
     }, []);
 
     // Efeito para carregar dados de turma caso seja edição
-    useEffect(() => {
-        if (location.state) {
-            const turmaState: Turma = location.state;
-            setForm({
-                id: turmaState?.id ?? undefined,
-                codigoTurma: turmaState.codigoTurma || "",
-                descricao: turmaState.descricao || "",
-                serie: turmaState.serie || "",
-                turno: turmaState.turno || "",
-                anoTurma: turmaState.anoTurma ? turmaState.anoTurma.toString() : "",
-                instituicaoEnsinoId: turmaState.instituicaoEnsino?.id?.toString() || "",
-                profissionalId: turmaState.profissional?.id?.toString() || "",
-                ativo: true // sempre true, mesmo em edição, se quiser permitir editar, adicione o campo
-            });
-            setIsEditing(true);
-        }
-    }, [location.state]);
+        useEffect(() => {
+            if (location.state) {
+                const turmaState: Turma = location.state;
+                setForm({
+                    id: turmaState?.id ?? undefined,
+                    codigoTurma: turmaState.codigoTurma || "",
+                    descricao: turmaState.descricao || "",
+                    serie: turmaState.serie ? String(turmaState.serie) : "",
+                    turno: turmaState.turno ? String(turmaState.turno) : "",
+                    anoTurma: turmaState.anoTurma ? turmaState.anoTurma.toString() : "",
+                    instituicaoEnsinoId: turmaState.instituicaoEnsino?.id?.toString() || "",
+                    profissionalId: turmaState.profissional?.id?.toString() || "",
+                    ativo: turmaState.ativo ?? true
+                });
+                setIsEditing(true);
+            } else {
+                setForm(initialFormState); // RESET para cadastro, mas NÃO redireciona
+                setIsEditing(false);
+            }
+        }, [location.state]);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = e.target;
@@ -128,6 +131,17 @@ const CadastroTurma: React.FC = () => {
         e.preventDefault();
         setSubmitted(true);
 
+        // Validação manual dos campos obrigatórios (exceto código e professor)
+        if (!form.descricao ||
+            !form.serie ||
+            !form.turno ||
+            !form.anoTurma ||
+            !form.instituicaoEnsinoId) {
+            alert('Preencha todos os campos obrigatórios.');
+            setSubmitted(false);
+            return;
+        }
+
         const payload: Turma = {
             id: undefined,
             codigoTurma: form.codigoTurma,
@@ -137,7 +151,6 @@ const CadastroTurma: React.FC = () => {
             anoTurma: Number(form.anoTurma),
             instituicaoEnsino: instituicoes.find(inst => inst.id.toString() === form.instituicaoEnsinoId),
             profissional: form.profissionalId ? profissionais.find(p => p.id.toString() === form.profissionalId) : undefined,
-
             ativo: true // sempre true
         };
 
@@ -176,7 +189,6 @@ const CadastroTurma: React.FC = () => {
                     >
                         <form onSubmit={handleSubmit}>
                             <StatContent>
-                                {/* Descrição: primeira linha, linha completa */}
                                 <StatLabel>
                                     Descrição:
                                     <InputPadrao
@@ -244,7 +256,7 @@ const CadastroTurma: React.FC = () => {
                                             value={form.codigoTurma}
                                             onChange={handleChange}
                                             style={{ textTransform: "uppercase" }}
-                                            required
+                                            // REMOVIDO required daqui
                                             disabled={submitted}
                                         />
                                     </StatLabel>
@@ -294,6 +306,7 @@ const CadastroTurma: React.FC = () => {
                                         name="profissionalId"
                                         value={form.profissionalId}
                                         onChange={handleChange}
+                                        // REMOVIDO required
                                         disabled={submitted}
                                         style={{
                                             width: "80%",
