@@ -59,7 +59,8 @@ const initialPessoaState: Pessoa = {
   email: "",
   telefone: "",
   dataCadastro: "",
-  dataAlteracao: ""
+  dataAlteracao: "",
+  statusNecessidade: ""
 };
 
 const initialFormState = {
@@ -111,7 +112,8 @@ const CadastroProfissional: React.FC = () => {
                     email: pessoaData.email || "",
                     telefone: pessoaData.telefone || "",
                     dataCadastro: pessoaData.dataCadastro || "",
-                    dataAlteracao: pessoaData.dataAlteracao || ""
+                    dataAlteracao: pessoaData.dataAlteracao || "",
+                    statusNecessidade: pessoaData.statusNecessidade || ""
                 },
                 instituicaoNome: profissionalData.instituicaoEnsino?.nome || "",
                 instituicaoId: profissionalData.instituicaoEnsino?.id || "",

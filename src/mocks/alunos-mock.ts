@@ -20,7 +20,8 @@ export const mockAlunos: Aluno[] = [
       email: "ana.souza@exemplo.com",
       telefone: "(11) 99999-1111",
       dataCadastro: "2023-01-15T14:30:00",
-      dataAlteracao: "2023-01-15T14:30:00"
+      dataAlteracao: "2023-01-15T14:30:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: {
       id: 42,
@@ -69,7 +70,8 @@ export const mockAlunos: Aluno[] = [
       email: "bruno.lima@exemplo.com",
       telefone: "(21) 99999-2222",
       dataCadastro: "2023-01-16T10:45:00",
-      dataAlteracao: "2023-01-16T10:45:00"
+      dataAlteracao: "2023-01-16T10:45:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: {
       id: 43,
@@ -118,7 +120,8 @@ export const mockAlunos: Aluno[] = [
       email: "carla.mendes@exemplo.com",
       telefone: "(31) 99999-3333",
       dataCadastro: "2023-01-17T09:15:00",
-      dataAlteracao: "2023-01-17T09:15:00"
+      dataAlteracao: "2023-01-17T09:15:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: {
       id: 44,
@@ -167,7 +170,8 @@ export const mockAlunos: Aluno[] = [
       email: "diego.farias@exemplo.com",
       telefone: "(41) 99999-4444",
       dataCadastro: "2023-01-18T11:20:00",
-      dataAlteracao: "2023-01-18T11:20:00"
+      dataAlteracao: "2023-01-18T11:20:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: {
       id: 45,
@@ -216,7 +220,8 @@ export const mockAlunos: Aluno[] = [
       email: "eduarda.silva@exemplo.com",
       telefone: "(71) 99999-5555",
       dataCadastro: "2023-01-19T13:40:00",
-      dataAlteracao: "2023-01-19T13:40:00"
+      dataAlteracao: "2023-01-19T13:40:00",
+      statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: {
       id: 46,
