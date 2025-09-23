@@ -70,7 +70,7 @@ interface alunoPayloadDef {
     id: number | undefined,
     pessoa: Pessoa,
     instituicaoNome: string,
-    instituicaoId: number | undefined | string,
+    instituicaoId: string | undefined,
     turmaId: string | undefined,
     status: string,
     dataIngresso: string,
@@ -213,7 +213,7 @@ export const CadastroAluno: React.FC = () => {
                         id: alunoEncontrado.id,
                         pessoa: alunoEncontrado.pessoa,
                         instituicaoNome: alunoEncontrado.instituicaoEnsino?.nome || "",
-                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino.id : "",
+                        instituicaoId: alunoEncontrado && alunoEncontrado.instituicaoEnsino ? alunoEncontrado.instituicaoEnsino?.id?.toString() : "",
                         turmaId: alunoEncontrado.turma?.id?.toString() || "",
                         status: alunoEncontrado.status,
                         dataIngresso: alunoEncontrado.dataIngresso.split('T')[0],
@@ -521,13 +521,7 @@ export const CadastroAluno: React.FC = () => {
                                     <CustomSelect
                                         name="instituicaoId"
                                         value={form.instituicaoId || ""}
-                                        onChange={e => {
-                                            handleChange(e);
-                                            setForm(prev => ({
-                                                ...prev,
-                                                turmaId: ""
-                                            }));
-                                        }}
+                                        onChange={handleInstituicaoSelect}
                                         required
                                         disabled={submitted}
                                         options={[
@@ -537,13 +531,6 @@ export const CadastroAluno: React.FC = () => {
                                                 label: inst.nome
                                             }))
                                         ]}
-                                        style={{
-                                            width: "80%",
-                                            padding: 8,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                            display: "block"
-                                        }}
                                     />
                                 </StatLabel>
 
@@ -562,13 +549,6 @@ export const CadastroAluno: React.FC = () => {
                                                 label: `${t.codigoTurma} - ${t.descricao}`
                                             }))
                                         ]}
-                                        style={{
-                                            width: "80%",
-                                            padding: 8,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                            display: "block"
-                                        }}
                                     />
                                 </StatLabel>
 

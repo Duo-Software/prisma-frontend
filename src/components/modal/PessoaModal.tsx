@@ -3,6 +3,7 @@ import Modal from './Modal';
 import { StatLabel } from '../layout/DefaultComponents';
 import { InputPadrao } from '../layout/InputPadrao';
 import styled from 'styled-components';
+import type {Pessoa} from "../../services/pessoaService.ts";
 // import { Etnia } from '../../mocks/etnia';
 // import { municipiosBrasileiros } from '../../mocks/municipios-mock';
 
@@ -82,26 +83,6 @@ const ModalGrid = styled.div`
 //     // { id: 26, nome: "Sergipe", sigla: "SE" },
 //     // { id: 27, nome: "Tocantins", sigla: "TO" },
 // ];
-
-interface Pessoa {
-    id: string;
-    nome: string;
-    cpf: string;
-    sexo: string;
-    etnia: string;
-    dataNascimento: string;
-    paisNaturalidade: { id: string; nome: string };
-    ufNaturalidade: { id: string; sigla: string; nome: string };
-    municipioNaturalidade: { id: string; nome: string; uf: string };
-    nomeMae: string;
-    nomePai: string;
-    endereco: string;
-    email: string;
-    telefone: string;
-    dataCadastro: string;
-    dataAlteracao: string;
-    statusNecessidade: string;
-}
 
 interface PessoaModalProps {
     isOpen: boolean;
@@ -271,7 +252,7 @@ const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, init
     function validarCamposObrigatorios(): { val: boolean, erro?: string } {
         if (!pessoa.nome.trim())
             return { val: false, erro: 'O nome é obrigatório.' };
-        if (!pessoa.cpf.trim() || pessoa.cpf.replace(/\D/g, '').length < 11)
+        if (!pessoa?.cpf?.trim() || pessoa.cpf?.replace(/\D/g, '').length < 11)
             return { val: false, erro: 'Informe um CPF válido.' };
         if (!pessoa.sexo)
             return { val: false, erro: 'Selecione o sexo.' };
