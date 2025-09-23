@@ -34,7 +34,10 @@ export const authService = {
             });
             return true;
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status === 401) this.logout();
+            if (axios.isAxiosError(error)
+                && (error.response?.status === 401 || error.response?.status === 403)) {
+                this.logout();
+            }
             return false;
         }
     },

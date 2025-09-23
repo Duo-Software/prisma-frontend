@@ -284,18 +284,20 @@ export const CadastroAluno: React.FC = () => {
         }));
     }
 
-    function handleInstituicaoSelect(instituicao: any) {
+    function handleInstituicaoSelect(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { value } = e.target;
         setForm(prev => ({
             ...prev,
-            instituicaoId: instituicao.id,
-            instituicaoNome: instituicao.nome,
+            instituicaoId: value,
             turmaId: "" // limpa a turma se alterar a instituição
         }));
-    
+        console.log(value);
         // Filtrar turmas para esta instituição
         setTurmasFiltradas(
-            turmas.filter(t => t?.instituicaoEnsino?.id === instituicao?.id)
+            turmas.filter(t => t?.instituicaoEnsino?.id === Number(value))
         );
+        console.log('turmas', turmas)
+        console.log(turmasFiltradas);
     }
 
 
