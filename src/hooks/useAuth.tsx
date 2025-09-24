@@ -1,6 +1,8 @@
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import axios from "axios";
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -35,19 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             const isValid = await authService.validateToken();
             setIsAuthenticated(isValid);
-            setToken(storedToken);
 
-            if (!isValid) {
-                authService.logout();
-                setToken(null);
-                navigate('/login');
+            if (isValid) {
+                setToken(storedToken);
+            } else {
+                // Só executar logout se o token for inválido
+                handleLogout();
             }
         } catch (error) {
             console.error('Erro ao validar token:', error);
-            setIsAuthenticated(false);
-            setToken(null);
-            authService.logout();
-            navigate('/login');
+            // Não fazer logout automático em caso de erro de rede ou servidor
+            // Manter o usuário logado se já tiver um token
+            if (authService.getToken()) {
+                setIsAuthenticated(true);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -74,11 +77,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const logout = () => {
-        authService.logout();
+    const handleLogout = () => {
         setToken(null);
         setIsAuthenticated(false);
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
         navigate('/login');
+    };
+
+    const logout = () => {
+        handleLogout();
     };
 
     return (

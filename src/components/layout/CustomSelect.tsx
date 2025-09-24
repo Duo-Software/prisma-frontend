@@ -6,7 +6,7 @@ const SelectContainer = styled.div`
   width: 80%;
 `;
 
-const SelectInput = styled.input<{ textColor?: string }>`
+const SelectInput = styled.input<{ textColor?: string, backgroundColor?: string }>`
   width: 100%;
   padding: 8px;
   margin-top: 4px;
@@ -15,7 +15,7 @@ const SelectInput = styled.input<{ textColor?: string }>`
   border: 1px solid #ccc;
   border-radius: 4px;
   text-color: ${props => props.theme.colors.primaryLight};
-  background-color: ${props => props.theme.colors.background};
+  background-color: ${props => props.backgroundColor ? props.backgroundColor : props.theme.colors.surface};
   color: ${props => props.theme.colors.primary || 'inherit'};
 `;
 
@@ -35,22 +35,18 @@ const DropdownList = styled.ul`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownItem = styled.li<{ textColor?: string; selectedTextColor?: string; isSelected?: boolean }>`
+const DropdownItem = styled.li<{ textColor?: string; selectedTextColor?: string; isSelected?: boolean; backgroundColor?: string }>`
   padding: 8px 10px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   color: ${props => (props.isSelected ? props.selectedTextColor : props.textColor) || 'inherit'};
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${props => props.backgroundColor || props.theme?.colors?.surface || '#f5f5f5'};
   }
 
   &:last-child {
     border-bottom: none;
-  }
-  
-  &.selected {
-    background-color: #e6f7ff;
   }
 `;
 
@@ -80,10 +76,10 @@ interface CustomSelectProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  // ... outras props existentes
   textColor?: string;
   selectedTextColor?: string;
   hoverTextColor?: string;
+  backgroundColor?: string;
 }
 
 // No componente, passar as cores para os elementos styled
@@ -97,9 +93,9 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   disabled = false,
   placeholder = "Selecione...",
   className,
-  // ... outras props
   textColor,
-  selectedTextColor
+  selectedTextColor,
+  backgroundColor
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState("");
@@ -167,6 +163,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         readOnly
         // ... props existentes
         textColor={selectedTextColor}
+        backgroundColor={backgroundColor}
       />
       <ArrowIcon>▼</ArrowIcon>
       
@@ -180,6 +177,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               textColor={textColor}
               selectedTextColor={selectedTextColor}
               isSelected={option.value === value}
+              backgroundColor={backgroundColor}
             >
               {option.label}
             </DropdownItem>

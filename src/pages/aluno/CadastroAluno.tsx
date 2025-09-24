@@ -291,13 +291,9 @@ export const CadastroAluno: React.FC = () => {
             instituicaoId: value,
             turmaId: "" // limpa a turma se alterar a instituição
         }));
-        console.log(value);
-        // Filtrar turmas para esta instituição
         setTurmasFiltradas(
             turmas.filter(t => t?.instituicaoEnsino?.id === Number(value))
         );
-        console.log('turmas', turmas)
-        console.log(turmasFiltradas);
     }
 
 
@@ -327,72 +323,6 @@ export const CadastroAluno: React.FC = () => {
         }
 
         setSubmitted(true);
-
-        const turmaCad: Turma | undefined = turmas.find(t => t.id === Number(form.turmaId));
-
-        // Preparar objeto a ser enviado para a API
-        const alunoPayload: Aluno = {
-            id: form.id,
-            pessoa: {
-                id: form.pessoa.id,
-                nome: form.pessoa.nome,
-                cpf: form.pessoa.cpf,
-                sexo: form.pessoa.sexo,
-                dataNascimento: form.pessoa.dataNascimento,
-                dataCadastro: "",
-                dataAlteracao: "",
-                paisNaturalidade: { id: 1, nome: "Brasil" },
-                ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
-                municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT" },
-                statusNecessidade: form.pessoa.statusNecessidade
-            },
-            instituicaoEnsino: {
-                id: form.instituicaoId,
-                nome: form.instituicaoNome,
-                sigla: "", // Preenchido pelo backend
-                tipoInstituicaoEnsino: "",
-                municipio: {
-                    id: 0,
-                    nome: "",
-                    codigoIbge: 0,
-                    unidadeFederativa: {
-                        id: 0,
-                        nome: "",
-                        sigla: "",
-                        pais: {
-                            id: 0,
-                            nome: "",
-                            sigla: ""
-                        }
-                    }
-                },
-                ativo: true
-            },
-            turma: turmaCad,
-            status: form.status as StatusAluno,
-            dataIngresso: new Date(form.dataIngresso).toISOString(),
-            dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
-            dataCadastro: "", // Será preenchido pelo backend
-            dataAlteracao: "" // Será preenchido pelo backend
-        };
-
-
-        console.log(alunoPayload);
-
-        // Aqui você deve chamar a API correspondente (POST para criar, PUT para editar)
-        // Por exemplo:
-        // if (isEditing) {
-        //     api.put(`/alunos/${form.id}`, alunoPayload);
-        // } else {
-        //     api.post('/alunos', alunoPayload);
-        // }
-
-        // Simulação de sucesso para exemplo
-        setTimeout(() => {
-            setSubmitted(false);
-            // Redirecionar de volta para a lista após salvar
-            navigate('/alunos');
-        }, 1500);
     }
 
     // Função para download do arquivo
@@ -415,6 +345,51 @@ export const CadastroAluno: React.FC = () => {
             }
         }
     };
+
+    async function preparaAndSaveAluno() {
+        setSubmitted(true);
+        try {
+            const etniaEnumValue = Object.entries(Etnia).find(([enumValue]) =>
+                enumValue === form.pessoa.etnia
+            )?.[1] || "";
+
+            const turmaCad: Turma | undefined = turmas.find(t => t.id === Number(form.turmaId));
+
+            form.pessoa.etnia = etniaEnumValue;
+            // Preparar objeto aluno
+            const alunoPayload: Aluno = {
+                id: form.id,
+                pessoa: {
+                    id: form.pessoa.id,
+                    nome: form.pessoa.nome,
+                    cpf: form.pessoa.cpf,
+                    sexo: form.pessoa.sexo,
+                    dataNascimento: form.pessoa.dataNascimento,
+                    dataCadastro: "",
+                    dataAlteracao: "",
+                    paisNaturalidade: {id: 1, nome: "Brasil"},
+                    ufNaturalidade: {id: 11, nome: "Mato Grosso", sigla: "MT"},
+                    municipioNaturalidade: {id: 110122, nome: "Sorriso", uf: "MT"},
+                    statusNecessidade: form.pessoa.statusNecessidade
+                },
+                instituicaoEnsino: {
+                    id: form.instituicaoId
+                },
+                turma: turmaCad,
+                status: form.status as StatusAluno,
+                dataIngresso: new Date(form.dataIngresso).toISOString(),
+                dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
+                dataCadastro: "", // Será preenchido pelo backend
+                dataAlteracao: "" // Será preenchido pelo backend
+            };
+            return await salvarAluno(alunoPayload);
+        } catch (error) {
+            console.error('Erro ao salvar aluno:', error);
+            alert('Ocorreu um erro ao salvar o aluno. Por favor, tente novamente.');
+        } finally {
+            setSubmitted(false);
+        }
+    }
 
     return (
         <>
@@ -494,7 +469,7 @@ export const CadastroAluno: React.FC = () => {
                                 </div>
                             </CardFixed>
                         ) : buscaEfetuada ? (
-                            <CardFixed style={{ padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center" }}>
+                            <CardFixed style={{ padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center", color: theme.colors.text }}>
                                 <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
                                 <ButtonStyled
                                     type="button"
@@ -619,6 +594,7 @@ export const CadastroAluno: React.FC = () => {
                                 <span style={{ textAlign: 'right', marginBottom: 10 }}>
                                     {form.pessoa.statusNecessidade === 'SIM' ? (
                                         <ButtonStyled
+                                            type="button"
                                             onClick={() => {
                                                 setAvaliacaoEdit({
                                                     idDiagnosticoPessoa: 0,
@@ -629,7 +605,9 @@ export const CadastroAluno: React.FC = () => {
                                                     idProfissionalResponsavel: 0,
                                                     arquivo: undefined
                                                 });
-                                                setIsModalAvaliacaoOpen(true);
+                                                setTimeout(() => {
+                                                    setIsModalAvaliacaoOpen(true);
+                                                }, 100);
                                             }}
                                             title="Cadastrar"
                                             style={{ padding: '4px 16px', fontSize: 14 }}
@@ -735,7 +713,7 @@ export const CadastroAluno: React.FC = () => {
                                         </table>
                                     </div>
                                 ) : (
-                                    <StatValueContent style={{ color: theme.colors.textSecondary }}>
+                                    <StatValueContent style={{ color: theme.colors.textSecondary }} hidden={form.pessoa?.statusNecessidade !== 'SIM'}>
                                         Nenhuma avaliação cadastrada para este aluno.
                                     </StatValueContent>
                                 )}
@@ -743,28 +721,41 @@ export const CadastroAluno: React.FC = () => {
                         )}
 
                         {/* Modal de edição/cadastro da Avaliação do Aluno */}
-                        <AvaliacaoAlunoModal
-                            isOpen={isModalAvaliacaoOpen}
-                            onClose={() => setIsModalAvaliacaoOpen(false)}
-                            initialData={avaliacaoEdit}
-                            isCadastro={!avaliacaoAluno}
-                            onSave={async (dados) => {
-                                try {
-                                    if (!avaliacaoAluno) {
-                                        // Cadastro
-                                        const novo = await cadastrarDiagnostico(dados);
-                                        setAvaliacaoAluno(novo);
-                                    } else {
-                                        // Edição
-                                        await atualizarDiagnostico(dados?.idDiagnosticoPessoa, dados);
-                                        setAvaliacaoAluno(dados);
-                                    }
+                        {isModalAvaliacaoOpen && (
+                            <AvaliacaoAlunoModal
+                                isOpen={isModalAvaliacaoOpen}
+                                onClose={() => {
                                     setIsModalAvaliacaoOpen(false);
-                                } catch (err) {
-                                    alert('Erro ao salvar avaliação.');
-                                }
-                            }}
-                        />
+                                }}
+                                initialData={avaliacaoEdit}
+                                isCadastro={!avaliacaoAluno}
+                                onSave={async (dados) => {
+                                    try {
+                                        if (dados.idDiagnosticoPessoa === undefined || dados.idDiagnosticoPessoa === 0) {
+                                            // Cadastro
+                                            if (dados.idPessoa === undefined || dados.idPessoa === 0 || Number(dados.idPessoa) === 0) {
+                                                try {
+                                                    const alunoSalvo = await preparaAndSaveAluno();
+                                                    dados.idPessoa = Number(alunoSalvo?.pessoa.id);
+                                                } catch (err) {
+                                                    alert('erro ao salvar dados pessoais de avaliacao')
+                                                }
+                                            }
+                                            const novo = await cadastrarDiagnostico(dados);
+                                            setAvaliacaoAluno(novo);
+                                        } else {
+                                            // Edição
+                                            await atualizarDiagnostico(dados?.idDiagnosticoPessoa, dados);
+                                            setAvaliacaoAluno(dados);
+                                        }
+                                        setIsModalAvaliacaoOpen(false);
+                                    } catch (err) {
+                                        console.error('Erro ao salvar avaliação:', err);
+                                        alert('Erro ao salvar avaliação.');
+                                    }
+                                }}
+                            />
+                        )}
 
                         {/* Modal para edição/cadastro de dados pessoais */}
                         <PessoaModal
@@ -788,49 +779,8 @@ export const CadastroAluno: React.FC = () => {
                                     type="button"
                                     disabled={submitted}
                                     onClick={async () => {
-                                        setSubmitted(true);
-                                        try {
-                                            const etniaEnumValue = Object.entries(Etnia).find(([enumValue]) =>
-                                                enumValue === form.pessoa.etnia
-                                            )?.[1] || "";
-
-                                            const turmaCad: Turma | undefined = turmas.find(t => t.id === Number(form.turmaId));
-
-                                            form.pessoa.etnia = etniaEnumValue;
-                                            // Preparar objeto aluno
-                                            const alunoPayload: Aluno = {
-                                                id: form.id,
-                                                pessoa: {
-                                                    id: form.pessoa.id,
-                                                    nome: form.pessoa.nome,
-                                                    cpf: form.pessoa.cpf,
-                                                    sexo: form.pessoa.sexo,
-                                                    dataNascimento: form.pessoa.dataNascimento,
-                                                    dataCadastro: "",
-                                                    dataAlteracao: "",
-                                                    paisNaturalidade: { id: 1, nome: "Brasil" },
-                                                    ufNaturalidade: { id: 11, nome: "Mato Grosso", sigla: "MT" },
-                                                    municipioNaturalidade: { id: 110122, nome: "Sorriso", uf: "MT"},
-                                                    statusNecessidade: form.pessoa.statusNecessidade
-                                                },
-                                                instituicaoEnsino: {
-                                                    id: form.instituicaoId
-                                                },
-                                                turma: turmaCad,
-                                                status: form.status as StatusAluno,
-                                                dataIngresso: new Date(form.dataIngresso).toISOString(),
-                                                dataEgresso: form.dataEgresso ? new Date(form.dataEgresso).toISOString() : undefined,
-                                                dataCadastro: "", // Será preenchido pelo backend
-                                                dataAlteracao: "" // Será preenchido pelo backend
-                                            };
-                                            await salvarAluno(alunoPayload);
-                                            navigate('/alunos'); // Redireciona após salvar com sucesso
-                                        } catch (error) {
-                                            console.error('Erro ao salvar aluno:', error);
-                                            alert('Ocorreu um erro ao salvar o aluno. Por favor, tente novamente.');
-                                        } finally {
-                                            setSubmitted(false);
-                                        }
+                                        await preparaAndSaveAluno();
+                                        navigate('/alunos'); // Redireciona após salvar com sucesso
                                     }}
                                 >
                                     {submitted ? "Salvando..." : (isEditing ? "Atualizar" : "Cadastrar")}

@@ -1,7 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import Modal from './Modal';
 import {InputPadrao} from '../layout/InputPadrao';
-import {ButtonStyled} from '../layout/DefaultComponents';
+import {ButtonStyled, StatLabel, StatValue} from '../layout/DefaultComponents';
+import {CustomSelect} from "../layout/CustomSelect.tsx";
+import {allCategories} from "../../enums/Categoria.ts";
+import {CID} from "../../enums/CidEnum.ts";
 
 interface Arquivo {
     idArquivo?: number;
@@ -50,6 +53,14 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
                                                                  }) => {
     const [avaliacao, setAvaliacao] = useState<AvaliacaoAluno>(initialAvaliacaoState);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [categoria, setCategoria] = useState('');
+    const [cids, setCids] = useState<{
+        readonly codigo: string;
+        readonly codigoEnum: string;
+        readonly descricao: string;
+        readonly categoria: string;
+    }[]>([]);
+
 
     useEffect(() => {
         if (initialData) {
@@ -62,6 +73,23 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const {name, value} = e.target;
         setAvaliacao(prev => ({...prev, [name]: value}));
+    }
+
+    function handleChangeCategoria(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const {value} = e.target;
+        setCategoria(value);
+        setCids(Object.values(CID).filter(cid => cid.categoria === value).map(cid => ({
+            codigo: cid.codigo,
+            codigoEnum: cid.codigoEnum,
+            descricao: cid.descricao,
+            categoria: cid.categoria
+        })));
+    }
+
+    function handleCid(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const {value} = e.target;
+        const cidSelecionado = Object.values(CID).find(cid => cid.codigo === value);
+        avaliacao.cid = cidSelecionado?.codigoEnum || "";
     }
 
     function handleArquivoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -89,11 +117,14 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (isSubmitting) return; // Evita chamadas duplicadas
+
         setIsSubmitting(true);
         try {
             // Teste visual para garantir que está entrando aqui
-            console.log('handleSubmit chamado', avaliacao);
             await onSave(avaliacao);
+            // Ao salvar com sucesso, fechamos o modal
+            onClose();
         } catch (err) {
             // Mostra erro no console
             console.error('Erro no handleSubmit do modal:', err);
@@ -105,46 +136,77 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Editar Diagnóstico do Aluno">
-            <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: 12}}>
-                <label>
-                    CID:
-                    <InputPadrao
-                        type="text"
-                        name="cid"
-                        value={avaliacao.cid}
-                        onChange={handleChange}
+            <form onSubmit={handleSubmit}>
+                <StatLabel>
+                    Categoria CID:
+                    <CustomSelect
+                        name="categoriaCID"
+                        value={categoria}
+                        onChange={handleChangeCategoria}
                         required
+                        disabled={isSubmitting}
+                        options={[
+                            { value: "", label: "Selecione..." },
+                            ...allCategories. map(cat => ({
+                                value: cat ?? "",
+                                label: cat
+                            }))
+                        ]}
+                        backgroundColor="white"
                     />
-                </label>
+                </StatLabel>
 
 
-                <label>
+
+                <StatLabel>
+                    CID:
+                    <CustomSelect
+                        name="cid"
+                        value={avaliacao.cid || ""}
+                        onChange={handleCid}
+                        required
+                        disabled={isSubmitting}
+                        options={[
+                            { value: "", label: "Selecione..." },
+                            ...cids.map(cid => ({
+                                value: cid.codigoEnum,
+                                label: cid.codigo + " - " + cid.descricao
+                            }))
+                        ]}
+                        backgroundColor="white"
+                    />
+                </StatLabel>
+
+
+                <StatLabel>
                     Parecer:
                     <InputPadrao
+                        isTextarea
+                        rows={4}
                         type="text"
                         name="parecer"
                         value={avaliacao.parecer}
                         onChange={handleChange}
                         required
                     />
-                </label>
-                <label>
+                </StatLabel>
+                <StatLabel hidden={avaliacao.idDiagnosticoPessoa === undefined || avaliacao.idDiagnosticoPessoa === null || avaliacao.idDiagnosticoPessoa === 0}>
                     Profissional Responsável:
-                    <span> {avaliacao.nomeProfissionalResponsavel}</span>
-                </label>
-                <label>
+                    <StatValue> {avaliacao.nomeProfissionalResponsavel}</StatValue>
+                </StatLabel>
+                <StatLabel>
                     Arquivo:
-                    <input
+                    <InputPadrao
                         type="file"
                         accept="application/pdf"
                         onChange={handleArquivoChange}
                     />
-                    {avaliacao.arquivo?.nome && (
+                    {(avaliacao.idDiagnosticoPessoa !== undefined && avaliacao.idDiagnosticoPessoa !== null && avaliacao.idDiagnosticoPessoa !== 0 && avaliacao.arquivo?.nome) && (
                         <div style={{fontSize: 13, marginTop: 4}}>
                             Arquivo atual: {avaliacao.arquivo.nome}
                         </div>
                     )}
-                </label>
+                </StatLabel>
                 <div style={{display: 'flex', justifyContent: 'flex-end', gap: 8}}>
                     <ButtonStyled type="button" onClick={onClose} style={{background: '#6c757d'}}>
                         Cancelar

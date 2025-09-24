@@ -219,17 +219,15 @@ const CadastroProfissional: React.FC = () => {
         setSubmitted(true);
 
         // Preparar objeto a ser enviado para a API
-        const profissionalPayload = {
-            id: form.id,
-            pessoa: form.pessoa,
-            instituicaoEnsino: {
-                id: form.instituicaoId
-            },
-            cargo: form.cargo,
-            ativo: form.ativo
-        };
-
-        console.log(profissionalPayload);
+        // const profissionalPayload = {
+        //     id: form.id,
+        //     pessoa: form.pessoa,
+        //     instituicaoEnsino: {
+        //         id: form.instituicaoId
+        //     },
+        //     cargo: form.cargo,
+        //     ativo: form.ativo
+        // };
 
         // Aqui você deve chamar a API correspondente (POST para criar, PUT para editar)
         // Por exemplo:

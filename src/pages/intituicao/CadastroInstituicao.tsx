@@ -156,7 +156,6 @@ const CadastroInstituicao: React.FC = () => {
             tipoInstituicaoEnsino: form.tipoInstituicaoEnsino,
             ativo: form.ativo
         };
-        console.log(instituicaoPayload);
 
         (async () => {
             try {

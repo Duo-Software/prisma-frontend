@@ -4,6 +4,7 @@ import { StatLabel } from '../layout/DefaultComponents';
 import { InputPadrao } from '../layout/InputPadrao';
 import styled from 'styled-components';
 import type {Pessoa} from "../../services/pessoaService.ts";
+import {CustomSelect} from "../layout/CustomSelect.tsx";
 // import { Etnia } from '../../mocks/etnia';
 // import { municipiosBrasileiros } from '../../mocks/municipios-mock';
 
@@ -48,7 +49,7 @@ const ModalGrid = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-
+    margin-bottom: 10%;
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
     }
@@ -344,24 +345,19 @@ const PessoaModal: React.FC<PessoaModalProps> = ({ isOpen, onClose, onSave, init
                 </StatLabel>
                 <StatLabel>
                     Sexo:
-                    <select
+                    <CustomSelect
                         name="sexo"
-                        value={pessoa.sexo}
+                        value={pessoa.sexo || ""}
                         onChange={handleChange}
                         required
                         disabled={isSubmitting}
-                        style={{
-                            width: "85%",
-                            padding: 8,
-                            marginTop: 4,
-                            marginBottom: 4,
-                            display: "block"
-                        }}
-                    >
-                        <option value="">Selecione...</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Feminino</option>
-                    </select>
+                        options={[
+                            { value: "", label: "Selecione..." },
+                            { value: "M", label: "Masculino" },
+                            { value: "F", label: "Feminino" }
+                        ]}
+                    />
+
                 </StatLabel>
                 {/*<StatLabel>*/}
                 {/*    Etnia:*/}

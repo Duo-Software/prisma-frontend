@@ -42,7 +42,6 @@ export const formatarCpf = (cpf: string): string => {
 
 // Função para criar ou atualizar aluno
 export const salvarAluno = async (aluno: Aluno): Promise<Aluno> => {
-  console.log(aluno);
   if (aluno.id) {
     // Atualização
     const response = await axios.put(`${API_URL}/alunos/${aluno.id}`, aluno);
