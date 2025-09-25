@@ -88,8 +88,11 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
 
     function handleCid(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const {value} = e.target;
-        const cidSelecionado = Object.values(CID).find(cid => cid.codigo === value);
-        avaliacao.cid = cidSelecionado?.codigoEnum || "";
+        const cidSelecionado = Object.values(CID).find(cid => cid.codigoEnum === value);
+        setAvaliacao(prev => ({
+            ...prev,
+            cid: cidSelecionado?.codigoEnum || ""
+        }));
     }
 
     function handleArquivoChange(e: React.ChangeEvent<HTMLInputElement>) {

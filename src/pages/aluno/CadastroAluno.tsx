@@ -29,11 +29,17 @@ import { CustomSelect } from "../../components/layout/CustomSelect.tsx";
 import type {Aluno} from "../../types/aluno";
 import {buscarAlunoPorCpf, salvarAluno} from "../../services/alunoService.ts";
 import {Etnia} from "../../mocks/etnia.ts";
-import { buscarDiagnosticoPorPessoa, atualizarDiagnostico, cadastrarDiagnostico } from '../../services/diagnosticoPessoaService.ts';
+import {
+    buscarDiagnosticoPorPessoa,
+    atualizarDiagnostico,
+    cadastrarDiagnostico,
+    definirDiagnosticoPrincipal
+} from '../../services/diagnosticoPessoaService.ts';
 import AvaliacaoAlunoModal from '../../components/modal/AvaliacaoAlunoModal';
 import { recuperaArquivoById } from '../../services/arquivoService';
 import { buscarTurmas, type Turma } from "../../services/turmaService";
 import {FiPlus} from "react-icons/fi";
+import {getCIDByCodigo, getDescricaoCompletaByCodigo} from "../../enums/CidEnum.ts";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -98,7 +104,7 @@ export const CadastroAluno: React.FC = () => {
     const [pessoaEncontrada, setPessoaEncontrada] = useState(false);
     const [buscaEfetuada, setBuscaEfetuada] = useState(false);
     const [alunoExistente, setAlunoExistente] = useState(false);
-    const [avaliacaoAluno, setAvaliacaoAluno] = useState<any>(null);
+    const [avaliacaoAluno, setAvaliacaoAluno] = useState<any[]>([]);
     const [isModalAvaliacaoOpen, setIsModalAvaliacaoOpen] = useState(false);
     const [avaliacaoEdit, setAvaliacaoEdit] = useState<any>(null);
     const { isSidebarOpen } = useSidebar();
@@ -170,21 +176,22 @@ export const CadastroAluno: React.FC = () => {
         }
     }, [form.instituicaoId, turmas]);
 
-    // Buscar avaliação do aluno ao encontrar pessoa
+    // Buscar avaliações do aluno ao encontrar pessoa
     useEffect(() => {
-        const fetchAvaliacao = async () => {
+        const fetchAvaliacoes = async () => {
             if (pessoaEncontrada && form.pessoa.id) {
                 try {
-                    const diagnostico = await buscarDiagnosticoPorPessoa(form.pessoa.id);
-                    setAvaliacaoAluno(diagnostico);
+                    const diagnosticos = await buscarDiagnosticoPorPessoa(form.pessoa.id);
+                    // Agora diagnosticos é uma lista
+                    setAvaliacaoAluno(Array.isArray(diagnosticos) ? diagnosticos : [diagnosticos].filter(Boolean));
                 } catch (e) {
-                    setAvaliacaoAluno(null);
+                    setAvaliacaoAluno([]);
                 }
             } else {
-                setAvaliacaoAluno(null);
+                setAvaliacaoAluno([]);
             }
         };
-        fetchAvaliacao();
+        fetchAvaliacoes();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pessoaEncontrada, form.pessoa.id]);
 
@@ -284,6 +291,17 @@ export const CadastroAluno: React.FC = () => {
         }));
     }
 
+    function handleChangePrincipal(diagnostico: any) {
+        try {
+            const response = definirDiagnosticoPrincipal(diagnostico.idDiagnosticoPessoa);
+            console.log(response);
+            setAvaliacaoAluno(avaliacaoAluno => (avaliacaoAluno.map(d => d.idDiagnosticoPessoa === diagnostico.idDiagnosticoPessoa ? {...d, principal: !d.principal} : d)));
+            setAvaliacaoAluno(avaliacaoAluno => (avaliacaoAluno.map(d => d.idDiagnosticoPessoa !== diagnostico.idDiagnosticoPessoa ? {...d, principal: false} : d)));
+        } catch (e) {
+            console.error("Erro ao definir diagnóstico principal:", e);
+        }
+    }
+
     function handleInstituicaoSelect(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { value } = e.target;
         setForm(prev => ({
@@ -326,14 +344,14 @@ export const CadastroAluno: React.FC = () => {
     }
 
     // Função para download do arquivo
-    const handleDownloadArquivo = async () => {
-        if (avaliacaoAluno?.arquivo?.idArquivo) {
+    const handleDownloadArquivo = async (idArquivo: number, nome: string, tipo: string) => {
+        if (idArquivo) {
             try {
-                const arquivo = await recuperaArquivoById(avaliacaoAluno.arquivo.idArquivo);
+                const arquivo = await recuperaArquivoById(idArquivo);
                 if (arquivo && arquivo.conteudo) {
                     const link = document.createElement('a');
-                    link.href = `data:${arquivo.tipo};base64,${arquivo.conteudo}`;
-                    link.download = arquivo.nome;
+                    link.href = `data:${tipo};base64,${arquivo.conteudo}`;
+                    link.download = nome;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -616,7 +634,7 @@ export const CadastroAluno: React.FC = () => {
                                         </ButtonStyled>
                                     ):''}
                                 </span>
-                                {avaliacaoAluno ? (
+                                {avaliacaoAluno && avaliacaoAluno.length > 0 ? (
                                     <div style={{ width: '100%' }}>
                                         <table style={{ 
                                             width: '100%', 
@@ -636,6 +654,13 @@ export const CadastroAluno: React.FC = () => {
                                                         backgroundColor: theme.colors.primary,
                                                         color: theme.colors.sidebarText
                                                     }}>CID</th>
+                                                    <th style={{
+                                                        padding: '10px 12px',
+                                                        textAlign: 'left',
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>Principal</th>
                                                     <th style={{ 
                                                         padding: '10px 12px', 
                                                         textAlign: 'left', 
@@ -660,55 +685,77 @@ export const CadastroAluno: React.FC = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td style={{ 
-                                                        padding: '8px 12px', 
-                                                        borderBottom: `1px solid ${theme.colors.border}`,
-                                                        backgroundColor: theme.colors.surface
-                                                    }}>{avaliacaoAluno.cid}</td>
-                                                    <td style={{ 
-                                                        padding: '8px 12px', 
-                                                        borderBottom: `1px solid ${theme.colors.border}`,
-                                                        backgroundColor: theme.colors.surface
-                                                    }}>{avaliacaoAluno.parecer}</td>
-                                                    <td style={{ 
-                                                        padding: '8px 12px', 
-                                                        borderBottom: `1px solid ${theme.colors.border}`,
-                                                        backgroundColor: theme.colors.surface
-                                                    }}>{avaliacaoAluno.nomeProfissionalResponsavel}</td>
-                                                    <td style={{ 
-                                                        padding: '8px 12px', 
-                                                        borderBottom: `1px solid ${theme.colors.border}`,
-                                                        backgroundColor: theme.colors.surface
-                                                    }}>
-                                                        {avaliacaoAluno.arquivo && avaliacaoAluno.arquivo.idArquivo ? (
-                                                            <a
-                                                                href="#"
-                                                                style={{ 
-                                                                    color: theme.colors.primary,
-                                                                    textDecoration: 'underline',
-                                                                    transition: theme.transition
-                                                                }}
-                                                                onClick={e => {
-                                                                    e.preventDefault();
-                                                                    handleDownloadArquivo();
-                                                                }}
-                                                                onMouseOver={e => {
-                                                                    e.currentTarget.style.color = theme.colors.primaryLight;
-                                                                }}
-                                                                onMouseOut={e => {
-                                                                    e.currentTarget.style.color = theme.colors.primary;
-                                                                }}
-                                                            >
-                                                                {avaliacaoAluno.arquivo.nome}
-                                                            </a>
-                                                        ) : (
-                                                            <StatValueContent style={{ color: theme.colors.textSecondary }}>
-                                                                Não informado
-                                                            </StatValueContent>
-                                                        )}
-                                                    </td>
-                                                </tr>
+                                                {avaliacaoAluno.map((diagnostico, index) => (
+                                                    <tr key={diagnostico.idDiagnosticoPessoa || index}>
+                                                        <td style={{ 
+                                                            padding: '8px 12px', 
+                                                            borderBottom: `1px solid ${theme.colors.border}`,
+                                                            backgroundColor: theme.colors.surface
+                                                        }}
+                                                            title={getDescricaoCompletaByCodigo(diagnostico.cid) || ""}
+                                                        >{getCIDByCodigo(diagnostico.cid)?.codigo}</td>
+                                                        <td style={{
+                                                            padding: '8px 12px',
+                                                            borderBottom: `1px solid ${theme.colors.border}`,
+                                                            backgroundColor: theme.colors.surface,
+                                                            textAlign: 'center' // opcional, para centralizar o checkbox
+                                                        }}>
+                                                            <InputPadrao
+                                                                type="checkbox"
+                                                                checked={diagnostico.principal}
+                                                                value={diagnostico.principal}
+                                                                onChange={() => handleChangePrincipal(diagnostico)}
+                                                                style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ 
+                                                            padding: '8px 12px', 
+                                                            borderBottom: `1px solid ${theme.colors.border}`,
+                                                            backgroundColor: theme.colors.surface
+                                                        }}>{diagnostico.parecer}</td>
+                                                        <td style={{ 
+                                                            padding: '8px 12px', 
+                                                            borderBottom: `1px solid ${theme.colors.border}`,
+                                                            backgroundColor: theme.colors.surface
+                                                        }}>{diagnostico.nomeProfissionalResponsavel}</td>
+                                                        <td style={{ 
+                                                            padding: '8px 12px', 
+                                                            borderBottom: `1px solid ${theme.colors.border}`,
+                                                            backgroundColor: theme.colors.surface
+                                                        }}>
+                                                            {diagnostico.arquivo && diagnostico.arquivo.idArquivo ? (
+                                                                <a
+                                                                    href="#"
+                                                                    style={{ 
+                                                                        color: theme.colors.primary,
+                                                                        textDecoration: 'underline',
+                                                                        transition: theme.transition
+                                                                    }}
+                                                                    onClick={e => {
+                                                                        e.preventDefault();
+                                                                        handleDownloadArquivo(
+                                                                            diagnostico.arquivo.idArquivo, 
+                                                                            diagnostico.arquivo.nome,
+                                                                            diagnostico.arquivo.tipo
+                                                                        );
+                                                                    }}
+                                                                    onMouseOver={e => {
+                                                                        e.currentTarget.style.color = theme.colors.primaryLight;
+                                                                    }}
+                                                                    onMouseOut={e => {
+                                                                        e.currentTarget.style.color = theme.colors.primary;
+                                                                    }}
+                                                                >
+                                                                    {diagnostico.arquivo.nome}
+                                                                </a>
+                                                            ) : (
+                                                                <StatValueContent style={{ color: theme.colors.textSecondary }}>
+                                                                    Não informado
+                                                                </StatValueContent>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
                                             </tbody>
                                         </table>
                                     </div>
@@ -742,11 +789,17 @@ export const CadastroAluno: React.FC = () => {
                                                 }
                                             }
                                             const novo = await cadastrarDiagnostico(dados);
-                                            setAvaliacaoAluno(novo);
+                                            // Adicionar o novo diagnóstico à lista existente
+                                            setAvaliacaoAluno(prev => [...prev, novo]);
                                         } else {
                                             // Edição
-                                            await atualizarDiagnostico(dados?.idDiagnosticoPessoa, dados);
-                                            setAvaliacaoAluno(dados);
+                                            const atualizado = await atualizarDiagnostico(dados?.idDiagnosticoPessoa, dados);
+                                            // Substituir o diagnóstico editado na lista
+                                            setAvaliacaoAluno(prev => 
+                                                prev.map(item => 
+                                                    item.idDiagnosticoPessoa === dados.idDiagnosticoPessoa ? atualizado : item
+                                                )
+                                            );
                                         }
                                         setIsModalAvaliacaoOpen(false);
                                     } catch (err) {

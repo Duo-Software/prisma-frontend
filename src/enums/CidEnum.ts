@@ -444,4 +444,38 @@ export const CID = {
     },
 } as const;
 
+//gere uma funcao para recuperar o CID completo de acorodo com o codigo informado
+
+/**
+ * Recupera os detalhes completos de um CID a partir do seu código
+ * @param codigo O código do CID (ex: "F70", "F80.2", etc.)
+ * @returns O objeto CID completo ou undefined caso não seja encontrado
+ */
+export const getCIDByCodigo = (codigo: string) => {
+  if (!codigo) return undefined;
+  
+  // Normaliza o código substituindo pontos por underscore para buscar no objeto CID
+  const codigoNormalizado = codigo.replace(/\./g, '_');
+  
+  // Verifica se o código existe diretamente no objeto CID
+  if (codigoNormalizado in CID) {
+    return CID[codigoNormalizado as CIDType];
+  }
+  
+  // Caso não encontre diretamente, busca em todos os itens do objeto CID
+  for (const key in CID) {
+    if (CID[key as CIDType].codigo === codigo) {
+      return CID[key as CIDType];
+    }
+  }
+  
+  // Retorna undefined se não encontrar
+  return undefined;
+};
+
+export const getDescricaoCompletaByCodigo = (codigo: string) => {
+    const cid = getCIDByCodigo(codigo);
+    return cid?.categoria + " - " + cid?.descricao;
+}
+
 export type CIDType = keyof typeof CID;
