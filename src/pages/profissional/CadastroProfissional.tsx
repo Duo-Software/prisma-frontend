@@ -1,11 +1,4 @@
-/**
- * Componente de Cadastro de Profissional
- * 
- * Este componente permite o cadastro e edição de profissionais,
- * usando um modal para gerenciar os dados pessoais.
- */
-
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
     StatLabel,
     DefaultContainer,
@@ -13,18 +6,20 @@ import {
     FixedHeader,
     ButtonStyled,
     CardWrapper,
-    CardFixed, CardGrid
+    CardFixed,
+    CardGrid, StatValueContent
 } from "../../components/layout/DefaultComponents.tsx";
-import {useSidebar} from "../../context/SidebarContext.tsx";
-import {useTheme} from "styled-components";
-import {InputPadrao} from "../../components/layout/InputPadrao.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
-import {AutocompleteInstituicao} from "../../components/AutocompleteInstituicao.tsx";
-import { Cargo } from "../../mocks/cargo.ts";
+import { useSidebar } from "../../context/SidebarContext.tsx";
+import { useTheme } from "styled-components";
+import { InputPadrao } from "../../components/layout/InputPadrao.tsx";
+import { useLocation, useNavigate } from "react-router-dom";
+import { buscarInstituicoes, type Instituicao } from "../../services/instituicaoService.ts";
 import PessoaModal from "../../components/modal/PessoaModal.tsx";
 import { buscarPessoaPorCpf, type Pessoa, formatarCpf } from "../../services/pessoaService.ts";
 import styled from "styled-components";
-import {CustomSelect} from "../../components/layout/CustomSelect.tsx";
+import { CustomSelect } from "../../components/layout/CustomSelect.tsx";
+import { Cargo } from "../../mocks/cargo.ts";
+import { profissionalService } from "../../services/profissionalService";
 
 const InfoLink = styled.span`
   color: ${({theme}) => theme.colors.primary};
@@ -48,26 +43,35 @@ const initialPessoaState: Pessoa = {
   nome: "",
   cpf: "",
   sexo: "",
-  etnia: "",
+  etnia: null,
   dataNascimento: "",
-  paisNaturalidade: { id: "", nome: "" },
-  ufNaturalidade: { id: "", sigla: "", nome: "" },
-  municipioNaturalidade: { id: "", nome: "", uf: "" },
-  nomeMae: "",
-  nomePai: "",
-  endereco: "",
-  email: "",
-  telefone: "",
+  paisNaturalidade: null,
+  ufNaturalidade: null,
+  municipioNaturalidade: null,
+  nomeMae: null,
+  nomePai: null,
+  endereco: null,
+  email: null,
+  telefone: null,
   dataCadastro: "",
   dataAlteracao: "",
-  statusNecessidade: ""
+  statusNecessidade: null
 };
 
-const initialFormState = {
-    id: "",
+type ProfissionalFormDef = {
+    id: string | number | undefined,
+    pessoa: Pessoa,
+    instituicaoNome: string,
+    instituicaoId: string | undefined,
+    cargo: string,
+    ativo: boolean
+};
+
+const initialFormState: ProfissionalFormDef = {
+    id: undefined,
     pessoa: initialPessoaState,
     instituicaoNome: "",
-    instituicaoId: "",
+    instituicaoId: undefined,
     cargo: "",
     ativo: true
 };
@@ -81,54 +85,41 @@ const CadastroProfissional: React.FC = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [pessoaEncontrada, setPessoaEncontrada] = useState(false);
     const [buscaEfetuada, setBuscaEfetuada] = useState(false);
-    const {isSidebarOpen} = useSidebar();
+    const [instituicoes, setInstituicoes] = useState<Instituicao[]>([]);
+    const { isSidebarOpen } = useSidebar();
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
 
     // Efeito para carregar dados do profissional se estiver editando
     useEffect(() => {
-        // Verifica se há um profissional sendo passado pelo state da rota
         if (location.state) {
             const profissionalData = location.state;
             const pessoaData = profissionalData.pessoa || {};
 
-            // Preencher o formulário com os dados do profissional
             setForm({
                 id: profissionalData.id || "",
                 pessoa: {
-                    id: pessoaData.id || "",
-                    nome: pessoaData.nome || "",
-                    cpf: pessoaData.cpf || "",
-                    sexo: pessoaData.sexo || "",
-                    etnia: pessoaData.etnia || "",
-                    dataNascimento: pessoaData.dataNascimento || "",
-                    paisNaturalidade: pessoaData.paisNaturalidade || { id: "", nome: "" },
-                    ufNaturalidade: pessoaData.ufNaturalidade || { id: "", sigla: "", nome: "" },
-                    municipioNaturalidade: pessoaData.municipioNaturalidade || { id: "", nome: "", uf: "" },
-                    nomeMae: pessoaData.nomeMae || "",
-                    nomePai: pessoaData.nomePai || "",
-                    endereco: pessoaData.endereco || "",
-                    email: pessoaData.email || "",
-                    telefone: pessoaData.telefone || "",
-                    dataCadastro: pessoaData.dataCadastro || "",
-                    dataAlteracao: pessoaData.dataAlteracao || "",
-                    statusNecessidade: pessoaData.statusNecessidade || ""
+                    ...initialPessoaState,
+                    ...pessoaData
                 },
                 instituicaoNome: profissionalData.instituicaoEnsino?.nome || "",
-                instituicaoId: profissionalData.instituicaoEnsino?.id || "",
+                instituicaoId: profissionalData.instituicaoEnsino?.id?.toString() || undefined,
                 cargo: profissionalData.cargo || "",
                 ativo: profissionalData.ativo !== undefined ? profissionalData.ativo : true
             });
 
-            // Marcar que estamos em modo de edição
             setIsEditing(true);
-            // Definir que já encontramos a pessoa
             setPessoaEncontrada(true);
-            // Preencher o campo de busca de CPF
             setCpfSearch(pessoaData.cpf || "");
         }
     }, [location]);
+
+    useEffect(() => {
+        buscarInstituicoes()
+            .then(setInstituicoes)
+            .catch(() => alert("Erro ao carregar instituições!"));
+    }, []);
 
     // Função para buscar pessoa por CPF
     const buscarPessoa = async () => {
@@ -140,14 +131,12 @@ const CadastroProfissional: React.FC = () => {
             const resultado = await buscarPessoaPorCpf(cpfSearch);
 
             if (resultado.encontrado) {
-                // Pessoa encontrada, atualizar o formulário
                 setForm(prev => ({
                     ...prev,
                     pessoa: resultado.pessoa as Pessoa
                 }));
                 setPessoaEncontrada(true);
             } else {
-                // Pessoa não encontrada, limpar os dados da pessoa (exceto CPF)
                 setForm(prev => ({
                     ...prev,
                     pessoa: {
@@ -156,7 +145,6 @@ const CadastroProfissional: React.FC = () => {
                     }
                 }));
                 setPessoaEncontrada(false);
-                // Abrir o modal para cadastro de nova pessoa
                 setIsModalOpen(true);
             }
         } catch (error) {
@@ -167,50 +155,45 @@ const CadastroProfissional: React.FC = () => {
     };
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        const {name, value, type} = e.target;
+        const { name, value } = e.target;
 
-        // Para o campo de CPF na busca
         if (name === "cpfSearch") {
-            // Limitar a 14 caracteres (formato 000.000.000-00)
             if (value.length <= 14) {
                 setCpfSearch(formatarCpf(value));
             }
             return;
         }
 
-        // Para os outros campos do formulário
-        setForm((prev) => ({
+        setForm(prev => ({
             ...prev,
-            [name]: type === "checkbox" && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value,
+            [name]: value
         }));
     }
 
-    function handleInstituicaoSelect(instituicao: any) {
-        setForm((prev) => ({
+    function handleInstituicaoSelect(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { value } = e.target;
+        setForm(prev => ({
             ...prev,
-            instituicaoId: instituicao.id,
-            instituicaoNome: instituicao.nome
+            instituicaoId: value
         }));
     }
-// Função para salvar os dados da pessoa do modal
+
     function handleSavePessoa(pessoaData: Pessoa) {
         setForm(prev => ({
             ...prev,
             pessoa: pessoaData
         }));
         setPessoaEncontrada(true);
+        setIsModalOpen(false);
     }
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        // Verificar se temos pessoa selecionada/cadastrada
-        if (!pessoaEncontrada || !form.pessoa.id) {
+        if (!pessoaEncontrada || !form.pessoa.nome || !form.pessoa.cpf) {
             alert("É necessário selecionar ou cadastrar uma pessoa primeiro.");
             return;
         }
-
-        // Verificar campos obrigatórios específicos do profissional
         if (!form.instituicaoId || !form.cargo) {
             alert("Preencha todos os campos obrigatórios.");
             return;
@@ -218,31 +201,28 @@ const CadastroProfissional: React.FC = () => {
 
         setSubmitted(true);
 
-        // Preparar objeto a ser enviado para a API
-        // const profissionalPayload = {
-        //     id: form.id,
-        //     pessoa: form.pessoa,
-        //     instituicaoEnsino: {
-        //         id: form.instituicaoId
-        //     },
-        //     cargo: form.cargo,
-        //     ativo: form.ativo
-        // };
+        const profissionalPayload = {
+            id: form.id,
+            pessoa: form.pessoa,
+            instituicaoEnsino: { id: form.instituicaoId },
+            cargo: form.cargo,
+            ativo: true
+        };
 
-        // Aqui você deve chamar a API correspondente (POST para criar, PUT para editar)
-        // Por exemplo:
-        // if (isEditing) {
-        //     api.put(`/profissionais/${form.id}`, profissionalPayload);
-        // } else {
-        //     api.post('/profissionais', profissionalPayload);
-        // }
-
-        // Simulação de sucesso para exemplo
-        setTimeout(() => {
-            setSubmitted(false);
-            // Redirecionar de volta para a lista após salvar
-            navigate('/profissionais');
-        }, 1500);
+        profissionalService.salvarProfissional
+            ? profissionalService.salvarProfissional(profissionalPayload)
+                .then(() => {
+                    setSubmitted(false);
+                    navigate('/profissionais');
+                })
+                .catch(() => {
+                    setSubmitted(false);
+                    alert('Erro ao salvar profissional');
+                })
+            : setTimeout(() => {
+                setSubmitted(false);
+                navigate('/profissionais');
+            }, 1500);
     }
 
     return (
@@ -254,27 +234,27 @@ const CadastroProfissional: React.FC = () => {
                     $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
                 >
                     <CardTitle>
-                        <h1>{isEditing ? "Edição de Profissional" : "Cadastro de Profissional"}</h1>
+                        <b>{isEditing ? "Edição de Profissional" : "Cadastro de Profissional"}</b>
                     </CardTitle>
                 </FixedHeader>
             </DefaultContainer>
 
-            <>
-                <CardWrapper
-                    $isSidebarOpen={isSidebarOpen}
-                    $sidebarWidth={theme.sizes.sidebarWidth}
-                    $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
-                >
-                    <form onSubmit={handleSubmit}>
+            <CardWrapper
+                $isSidebarOpen={isSidebarOpen}
+                $sidebarWidth={theme.sizes.sidebarWidth}
+                $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
+            >
+                <form onSubmit={handleSubmit}>
+                    {!isEditing && (
                         <CardFixed
                             style={{
                                 padding: 20,
                                 marginBottom: 20,
                                 minWidth: 450,
                                 display: "flex",
-                                flexDirection: "row", // garante alinhamento horizontal
-                                alignItems: "center",  // alinha ao centro verticalmente
-                                gap: 16,               // espaço entre elementos (opcional, para espaçamento)
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 16,
                                 textAlign: "center",
                             }}
                         >
@@ -288,7 +268,7 @@ const CadastroProfissional: React.FC = () => {
                                 onChange={handleChange}
                                 placeholder="Digite o CPF..."
                                 disabled={submitted || isSearching}
-                                style={{ marginLeft: 8 }} // Opcional: espaço entre label e input
+                                style={{ marginLeft: 8 }}
                             />
                             <SearchButton
                                 style={{ width: "90px" }}
@@ -299,100 +279,95 @@ const CadastroProfissional: React.FC = () => {
                                 {isSearching ? "Buscando..." : "Buscar"}
                             </SearchButton>
                         </CardFixed>
+                    )}
 
-                            {pessoaEncontrada ? (
-                                <CardFixed style={{padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center"}}>
-                                    <h3 style={{marginTop: 0}}>Dados Pessoais</h3>
-                                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10}}>
-                                        <StatLabel>Nome: <span>{form.pessoa.nome}</span></StatLabel>
-                                        <StatLabel>CPF: <span>{form.pessoa.cpf}</span></StatLabel>
-                                        <StatLabel>Data de
-                                            Nascimento: <span>{form.pessoa.dataNascimento}</span></StatLabel>
-                                        <StatLabel>Sexo: <span>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</span></StatLabel>
-                                        <StatLabel>Email: <span>{form.pessoa.email}</span></StatLabel>
-                                        <StatLabel>Telefone: <span>{form.pessoa.telefone}</span></StatLabel>
-                                    </div>
-                                    <div style={{textAlign: "right", marginTop: 10}}>
-                                        <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
-                                    </div>
-                                </CardFixed>
-                            ) : buscaEfetuada ? (
-                                <CardFixed style={{padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center"}}>
-                                    <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
-                                    <ButtonStyled
-                                        type="button"
-                                        onClick={() => setIsModalOpen(true)}
-                                        disabled={submitted}
-                                    >
-                                        Cadastrar Nova Pessoa
-                                    </ButtonStyled>
-                                </CardFixed>
-                            ) : null}
+                    {pessoaEncontrada ? (
+                        <CardFixed style={{ padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center" }}>
+                            <h3 style={{ marginTop: 0, color: theme.colors.primary }}>Dados Pessoais</h3>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                                <StatLabel>Nome: <StatValueContent style={{ color: theme.colors.textSecondary }}>{form.pessoa.nome}</StatValueContent></StatLabel>
+                                <StatLabel>CPF: <StatValueContent>{form.pessoa.cpf}</StatValueContent></StatLabel>
+                                <StatLabel>
+                                    Data de Nascimento:{" "}
+                                    <StatValueContent>
+                                        {form.pessoa.dataNascimento ? new Date(form.pessoa.dataNascimento).toLocaleDateString("pt-BR") : ""}
+                                    </StatValueContent>
+                                </StatLabel>
+                                <StatLabel>Sexo: <StatValueContent>{form.pessoa.sexo === "M" ? "Masculino" : form.pessoa.sexo === "F" ? "Feminino" : ""}</StatValueContent></StatLabel>
+                                {/* Inclua mais campos se desejar */}
+                            </div>
+                            <div style={{ textAlign: "right", marginTop: 10 }}>
+                                <InfoLink onClick={() => setIsModalOpen(true)}>Editar dados pessoais</InfoLink>
+                            </div>
+                        </CardFixed>
+                    ) : buscaEfetuada ? (
+                        <CardFixed style={{ padding: 20, minWidth: 450, marginBottom: 20, textAlign: "center", color: theme.colors.text }}>
+                            <p>Nenhuma pessoa encontrada. Busque por CPF ou cadastre uma nova pessoa.</p>
+                            <ButtonStyled
+                                type="button"
+                                onClick={() => setIsModalOpen(true)}
+                                disabled={submitted}
+                            >
+                                Cadastrar Nova Pessoa
+                            </ButtonStyled>
+                        </CardFixed>
+                    ) : null}
 
-                                <CardGrid style={{padding: 20, minWidth: 450, marginBottom: 20}}>
-                                    <h3>Dados Profissionais</h3>
-                                    <h3></h3>
-                                        <StatLabel>
-                                            Instituição de Ensino:
-                                            <AutocompleteInstituicao
-                                                name="instituicaoNome"
-                                                value={form.instituicaoNome}
-                                                onChange={handleChange}
-                                                onSelect={handleInstituicaoSelect}
-                                                required
-                                                disabled={submitted}
-                                            />
-                                        </StatLabel>
+                    {pessoaEncontrada && (
+                        <CardGrid style={{ padding: 20, minWidth: 450, marginBottom: 20 }}>
+                            <h3 style={{ textAlign: 'center', color: theme.colors.primary, gridColumn: '1 / -1' }}>
+                                Dados Profissionais
+                            </h3>
+                            <StatLabel>
+                                Instituição de Ensino:
+                                <CustomSelect
+                                    name="instituicaoId"
+                                    value={form.instituicaoId || ""}
+                                    onChange={handleInstituicaoSelect}
+                                    required
+                                    disabled={submitted}
+                                    options={[
+                                        { value: "", label: "Selecione..." },
+                                        ...instituicoes.map(inst => ({
+                                            value: inst.id?.toString() ?? "",
+                                            label: inst.nome
+                                        }))
+                                    ]}
+                                />
+                            </StatLabel>
+                            <StatLabel>
+                                Cargo:
+                                <CustomSelect
+                                    name="cargo"
+                                    value={form.cargo || ""}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={submitted}
+                                    options={[
+                                        { value: "", label: "Selecione..." },
+                                        ...Object.values(Cargo).map(cargo => ({
+                                            value: cargo,
+                                            label: cargo
+                                        }))
+                                    ]}
+                                />
+                            </StatLabel>
+                        </CardGrid>
+                    )}
 
-                                        <StatLabel>
-                                            Cargo:
-                                            <CustomSelect
-                                                name="cargo"
-                                                value={form.cargo}
-                                                onChange={handleChange}
-                                                options={Object.values(Cargo).map(cargo => ({
-                                                    value: cargo,
-                                                    label: cargo
-                                                }))}
-                                                required
-                                                disabled={submitted}
-                                                textColor={theme.colors.textSecondary}
-                                                selectedTextColor={theme.colors.primaryLight}
-                                            />
-                                        </StatLabel>
+                    <PessoaModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleSavePessoa}
+                        initialData={form.pessoa}
+                    />
 
-
-                                        <StatLabel
-                                            style={{
-                                                display: "flex",
-                                                justifyContent: "flex-end",
-                                                alignItems: "center",
-                                                marginRight: 32
-                                            }}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                name="ativo"
-                                                checked={form.ativo}
-                                                onChange={handleChange}
-                                                disabled={submitted}
-                                                style={{marginRight: 8}}
-                                            />
-                                            Ativo
-                                        </StatLabel>
-                                </CardGrid>
-
-                        {/* Modal para edição/cadastro de dados pessoais */}
-                        <PessoaModal
-                            isOpen={isModalOpen}
-                            onClose={() => setIsModalOpen(false)}
-                            onSave={handleSavePessoa}
-                                                    />
-                        <div style={{marginTop: 24, textAlign: "right"}}>
-                            <ButtonStyled 
-                                type="button" 
+                    {pessoaEncontrada && (
+                        <div style={{ marginTop: 24, textAlign: "right" }}>
+                            <ButtonStyled
+                                type="button"
                                 onClick={() => navigate('/profissionais')}
-                                style={{marginRight: 16, background: '#6c757d'}}
+                                style={{ marginRight: 16, background: '#6c757d' }}
                                 disabled={submitted}
                             >
                                 Cancelar
@@ -401,14 +376,15 @@ const CadastroProfissional: React.FC = () => {
                                 {submitted ? "Salvando..." : (isEditing ? "Atualizar" : "Cadastrar")}
                             </ButtonStyled>
                         </div>
-                        {submitted && (
-                            <div style={{marginTop: 16, color: "#228B22"}}>
-                                Profissional {isEditing ? "atualizado" : "cadastrado"} com sucesso!
-                            </div>
-                        )}
-                    </form>
-                </CardWrapper>
-            </>
+                    )}
+
+                    {submitted && (
+                        <div style={{ marginTop: 16, color: "#228B22" }}>
+                            Profissional {isEditing ? "atualizado" : "cadastrado"} com sucesso!
+                        </div>
+                    )}
+                </form>
+            </CardWrapper>
         </>
     );
 };

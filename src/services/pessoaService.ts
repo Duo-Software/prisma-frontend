@@ -1,4 +1,6 @@
-import { mockProfissionais } from '../mocks/profissionais-mock';
+import axios from 'axios';
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export interface Pessoa {
   id: string | number;
@@ -21,42 +23,33 @@ export interface Pessoa {
 }
 
 export interface PessoaResult {
-  pessoa: Pessoa;
+  pessoa: any;
   encontrado: boolean;
 }
 
-// Simula uma busca por CPF no backend
-export const buscarPessoaPorCpf = (cpf: string): Promise<PessoaResult> => {
-  return new Promise((resolve) => {
-    // Simula delay de API
-    setTimeout(() => {
-      // Remove caracteres especiais do CPF para comparação
-      const cpfLimpo = cpf.replace(/[^0-9]/g, '');
+export const buscarPessoaPorCpf = async (cpf: string): Promise<PessoaResult> => {
+  try {
+    const cpfLimpo = cpf.replace(/[^0-9]/g, '');
+    const response = await axios.get(`${BASE_URL}/pessoas/cpf/${cpfLimpo}`);
 
-      // Busca nos profissionais mockados
-      const profissionalEncontrado = mockProfissionais.find(
-        prof => prof.pessoa.cpf && prof.pessoa.cpf.replace(/[^0-9]/g, '') === cpfLimpo
-      );
-
-      if (profissionalEncontrado) {
-        resolve({
-          pessoa: profissionalEncontrado.pessoa,
-          encontrado: true
-        });
-      } else {
-        // Pessoa não encontrada
-        resolve({
-          pessoa: {
-            id: "",
-            nome: "",
-            cpf: formatarCpf(cpf),
-            statusNecessidade: "NAO_INFORMADO"
-          },
-          encontrado: false
-        });
-      }
-    }, 500); // Delay simulado de 500ms
-  });
+    return {
+      pessoa: response.data,
+      encontrado: true
+    };
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      return {
+        pessoa: {
+          id: "",
+          nome: "",
+          cpf: cpf,
+          statusNecessidade: "NAO_INFORMADO"
+        },
+        encontrado: false
+      };
+    }
+    throw error;
+  }
 };
 
 // Formata o CPF no padrão 000.000.000-00
