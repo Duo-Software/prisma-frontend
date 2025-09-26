@@ -90,6 +90,7 @@ const CadastroProfissional: React.FC = () => {
     const theme = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
+    const [cpfInvalido, setCpfInvalido] = useState(false);
 
     // Efeito para carregar dados do profissional se estiver editando
     useEffect(() => {
@@ -154,13 +155,44 @@ const CadastroProfissional: React.FC = () => {
         }
     };
 
+    function validaCpf(strCpf: string): boolean {
+        // Remove caracteres não numéricos
+        const cpf = strCpf.replace(/\D/g, "");
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+        let sum = 0, rest;
+
+        for (let i = 1; i <= 9; i++) sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        rest = (sum * 10) % 11;
+        if ((rest === 10) || (rest === 11)) rest = 0;
+        if (rest !== parseInt(cpf.substring(9, 10))) return false;
+
+        sum = 0;
+        for (let i = 1; i <= 10; i++) sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        rest = (sum * 10) % 11;
+        if ((rest === 10) || (rest === 11)) rest = 0;
+        if (rest !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+    }
+
+    function onlyNumbers(str: string) {
+        return (str || "").replace(/\D/g, "");
+    }
+
     function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = e.target;
 
         if (name === "cpfSearch") {
-            if (value.length <= 14) {
-                setCpfSearch(formatarCpf(value));
-            }
+            // Permite só números (ou seja, bloqueia qualquer não numérico) — faz a máscara depois
+            const numeric = value.replace(/\D/g, "");
+            // Máximo 11 dígitos numéricos
+            const limited = numeric.slice(0, 11);
+
+            // Aplica máscara se desejar mostrar no campo
+            setCpfSearch(formatarCpf(limited));
+
+            // Valida CPF só se completou 11 números
+            setCpfInvalido(limited.length === 11 && !validaCpf(limited));
             return;
         }
 
@@ -203,7 +235,10 @@ const CadastroProfissional: React.FC = () => {
 
         const profissionalPayload = {
             id: form.id,
-            pessoa: form.pessoa,
+            pessoa: {
+            ...form.pessoa,
+            cpf: onlyNumbers(form.pessoa.cpf) // garantir CPF sem máscara
+            },
             instituicaoEnsino: { id: form.instituicaoId },
             cargo: form.cargo,
             ativo: true
@@ -212,12 +247,12 @@ const CadastroProfissional: React.FC = () => {
         profissionalService.salvarProfissional
             ? profissionalService.salvarProfissional(profissionalPayload)
                 .then(() => {
-                    setSubmitted(false);
-                    navigate('/profissionais');
+                setSubmitted(false);
+                navigate('/profissionais');
                 })
                 .catch(() => {
-                    setSubmitted(false);
-                    alert('Erro ao salvar profissional');
+                setSubmitted(false);
+                alert('Erro ao salvar profissional');
                 })
             : setTimeout(() => {
                 setSubmitted(false);
@@ -263,21 +298,28 @@ const CadastroProfissional: React.FC = () => {
                             </StatLabel>
                             <InputPadrao
                                 type="text"
+                                inputMode="numeric"
                                 name="cpfSearch"
                                 value={cpfSearch}
                                 onChange={handleChange}
                                 placeholder="Digite o CPF..."
                                 disabled={submitted || isSearching}
                                 style={{ marginLeft: 8 }}
+                                maxLength={14}
                             />
                             <SearchButton
                                 style={{ width: "90px" }}
                                 type="button"
                                 onClick={buscarPessoa}
-                                disabled={submitted || isSearching || cpfSearch.length < 11}
+                                disabled={submitted || isSearching || cpfSearch.replace(/\D/g, "").length < 11 || cpfInvalido}
                             >
                                 {isSearching ? "Buscando..." : "Buscar"}
                             </SearchButton>
+                            {cpfInvalido && (
+                                <div style={{ color: "#dc3545", fontSize: 13, marginLeft: 10 }}>
+                                    CPF inválido
+                                </div>
+                            )}
                         </CardFixed>
                     )}
 

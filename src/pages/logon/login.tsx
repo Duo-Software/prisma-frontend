@@ -46,7 +46,7 @@ const Login: React.FC = () => {
                         gap: 16,
                         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
                     }}>
-                        <h1>Auth</h1>
+                        <h1>Olá novamente 👋</h1>
                         <StatContent>
                             <h2 style={{ marginBottom: 8 }}>Login</h2>
 
