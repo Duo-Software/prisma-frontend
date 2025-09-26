@@ -135,7 +135,11 @@ const Alunos: React.FC = () => {
                 </FixedHeader>
             </DefaultContainer>
 
-            <DashboardContainer>
+            <DashboardContainer
+                $isSidebarOpen={isSidebarOpen}
+                $sidebarWidth={theme.sizes.sidebarWidth}
+                $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
+            >
                 {loading && <div>Carregando alunos...</div>}
                 {!loading && filteredAlunos.length === 0 && (
                     <div>Nenhum aluno encontrado.</div>

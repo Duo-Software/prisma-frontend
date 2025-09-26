@@ -106,7 +106,11 @@ const Instituicoes: React.FC = () => {
 
             </DefaultContainer>
 
-                <DashboardContainer>
+                <DashboardContainer
+                    $isSidebarOpen={isSidebarOpen}
+                    $sidebarWidth={theme.sizes.sidebarWidth}
+                    $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
+                >
                     {loading && (
                         <div style={{ padding: '2rem', textAlign: 'center', width: '100%' }}>
                             Carregando instituições...

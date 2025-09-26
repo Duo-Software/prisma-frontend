@@ -10,11 +10,18 @@ import {
     StatIconWrapper, StatLabel, StatPeriod,
     StatsGrid, StatValue
 } from '../components/layout/DefaultComponents';
+import {useSidebar} from "../context/SidebarContext.tsx";
+import {useTheme} from "styled-components";
 
 export const Dashboard: React.FC = () => {
+    const { isSidebarOpen } = useSidebar();
+    const theme = useTheme();
     return (
 
-        <DashboardContainer>
+        <DashboardContainer
+            $isSidebarOpen={isSidebarOpen}
+            $sidebarWidth={theme.sizes.sidebarWidth}
+            $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}>
 
             <StatsGrid>
                 <Link to="/alunos" style={{textDecoration: "none"}}>

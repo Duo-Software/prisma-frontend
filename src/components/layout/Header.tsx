@@ -42,7 +42,7 @@ const Header: React.FC = () => {
 };
 
 const HeaderContainer = styled.header`
-    width: 100vw;
+    width: calc(100vw - ${props => props.theme.sizes.sidebarWidthCollapsed});   
     min-width: 0;
     position: fixed;
     top: 0;

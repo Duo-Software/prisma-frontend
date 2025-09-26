@@ -25,7 +25,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-05-15T10:30:00",
     dataAlteracao: "2024-05-15T10:30:00"
@@ -92,7 +92,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-05-18T11:10:00",
     dataAlteracao: "2024-05-18T11:10:00"
@@ -107,7 +107,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[3],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-05-02T13:25:00",
     dataAlteracao: "2024-05-02T13:25:00"
@@ -122,7 +122,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[1],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-04-20T09:50:00",
     dataAlteracao: "2024-05-05T14:40:00"
@@ -137,7 +137,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[4],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: false,
     dataCadastro: "2024-03-15T15:35:00",
     dataAlteracao: "2024-04-10T10:20:00"
@@ -152,7 +152,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[2],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-05-08T10:15:00",
     dataAlteracao: "2024-05-08T10:15:00"
@@ -182,7 +182,7 @@ export const mockProfissionais = [
       statusNecessidade: "NAO_INFORMADO"
     },
     instituicaoEnsino: mockInstitutions[0],
-    cargo: Cargo.SECRETARIO,
+    cargo: Cargo.PROFESSOR,
     ativo: true,
     dataCadastro: "2024-05-12T16:45:00",
     dataAlteracao: "2024-05-12T16:45:00"

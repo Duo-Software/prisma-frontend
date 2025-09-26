@@ -18,7 +18,11 @@ const relatorios = [
 
 const Relatorios: React.FC = () => {
 	return (
-		<DashboardContainer>
+		<DashboardContainer
+			$isSidebarOpen={true}
+			$sidebarWidth={'250px'}
+			$sidebarCollapsedWidth={'50px'}
+		>
 			<h2>Relatórios Disponíveis</h2>
 			<StatsGrid>
 				{relatorios.map((relatorio) => (

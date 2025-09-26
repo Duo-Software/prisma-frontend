@@ -37,3 +37,8 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
+
+export const returnTheme = (): any => {
+  const temausado = localStorage.getItem('theme');
+  return temausado === 'light' ? lightTheme : darkTheme;
+}

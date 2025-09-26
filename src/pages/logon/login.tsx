@@ -3,20 +3,18 @@ import {
     Card,
     StatContent,
     StatLabel,
-    FixedHeader,
     ButtonStyled,
-    CardTitle,
     LoginContainer,
 } from "../../components/layout/DefaultComponents.tsx";
-import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../hooks/useAuth";
+import logoPrisma from "../../assets/prisma_02.png";
+
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState("");
     const [senha, setSenha] = useState("");
     const [error, setError] = useState("");
     const { login, isLoading } = useAuth();
-    const { theme } = useTheme();
 
     const handleLogin = async () => {
         try {
@@ -31,16 +29,8 @@ const Login: React.FC = () => {
     return (
         <>
             <LoginContainer>
-                <FixedHeader
-                    $isSidebarOpen={false}
-                    $sidebarWidth={theme.sizes.sidebarWidth}
-                    $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
-                >
-                    <CardTitle>
-                        <h1>Bem-vindo ao PRISMA</h1>
-                    </CardTitle>
-                </FixedHeader>
 
+                <img src={logoPrisma} alt="Logo Prisma" height={200} />
                 <div style={{
                     display: "flex",
                     justifyContent: "center",

@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
-import GlobalStyles from './styles/GlobalStyles.ts';
-import { darkTheme } from './styles/theme';
 import Instituicoes from "./pages/intituicao/Instituicoes.tsx";
 import CadastroInstituicao from "./pages/intituicao/CadastroInstituicao.tsx";
 import Turmas from "./pages/turmas/Turmas";
@@ -21,6 +19,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { ThemeProvider as CustomThemeProvider } from './context/ThemeContext';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import {CadastroAluno} from "./pages/aluno/CadastroAluno.tsx";
+import {darkTheme, lightTheme} from "./styles/theme.ts";
 
 
 function App() {
@@ -29,7 +28,7 @@ function App() {
             <StyledThemeProvider theme={darkTheme}>
                 <Router>
                     <AuthProvider>
-                        <GlobalStyles theme={darkTheme} />
+                        <StyledThemeProvider theme={lightTheme} />
                         <Routes>
                             <Route path="/login" element={<Login />} />
 

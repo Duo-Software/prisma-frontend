@@ -25,7 +25,7 @@ export const DefaultContainer = styled.div`
 `;
 
 export const LoginContainer = styled.div`
-    position: relative;
+    position: absolute;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -52,7 +52,9 @@ export const CardTitle = styled.h2`
   margin: 0;
 `;
 
-export const DashboardContainer = styled.div`
+export const DashboardContainer = styled.div<FixedHeaderProps>`
+    margin-left: 1rem;
+    width: calc(95.8vw - ${props => props.$isSidebarOpen ? props.$sidebarWidth : props.$sidebarCollapsedWidth});
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;

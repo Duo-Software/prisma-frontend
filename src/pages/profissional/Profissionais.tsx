@@ -97,7 +97,11 @@ const Profissionais: React.FC = () => {
                 </FixedHeader>
             </DefaultContainer>
 
-            <DashboardContainer>
+            <DashboardContainer
+                $isSidebarOpen={isSidebarOpen}
+                $sidebarWidth={theme.sizes.sidebarWidth}
+                $sidebarCollapsedWidth={theme.sizes.sidebarWidthCollapsed}
+            >
                 {loading && <div>Carregando profissionais...</div>}
                 {!loading && filteredProfissionais.length === 0 && (
                     <div>Nenhum profissional encontrado.</div>

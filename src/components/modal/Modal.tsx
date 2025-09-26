@@ -68,6 +68,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, width, 
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.position = 'center';
+      document.body.style.display = 'flex';
+      document.body.style.alignItems = 'center';
+      document.body.style.justifyContent = 'center';
     }
 
     // Cleanup function

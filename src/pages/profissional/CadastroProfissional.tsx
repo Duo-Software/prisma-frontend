@@ -43,19 +43,19 @@ const initialPessoaState: Pessoa = {
   nome: "",
   cpf: "",
   sexo: "",
-  etnia: null,
+  etnia: undefined,
   dataNascimento: "",
-  paisNaturalidade: null,
-  ufNaturalidade: null,
-  municipioNaturalidade: null,
-  nomeMae: null,
-  nomePai: null,
-  endereco: null,
-  email: null,
-  telefone: null,
+  paisNaturalidade: undefined,
+  ufNaturalidade: undefined,
+  municipioNaturalidade: undefined,
+  nomeMae: undefined,
+  nomePai: undefined,
+  endereco: undefined,
+  email: undefined,
+  telefone: undefined,
   dataCadastro: "",
   dataAlteracao: "",
-  statusNecessidade: null
+  statusNecessidade: "NAO_INFORMADO"
 };
 
 type ProfissionalFormDef = {
