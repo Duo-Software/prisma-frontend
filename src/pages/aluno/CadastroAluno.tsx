@@ -33,12 +33,13 @@ import {
     buscarDiagnosticoPorPessoa,
     atualizarDiagnostico,
     cadastrarDiagnostico,
-    definirDiagnosticoPrincipal
+    definirDiagnosticoPrincipal,
+    deletarDiagnostico
 } from '../../services/diagnosticoPessoaService.ts';
 import AvaliacaoAlunoModal from '../../components/modal/AvaliacaoAlunoModal';
 import { recuperaArquivoById } from '../../services/arquivoService';
 import { buscarTurmas, type Turma } from "../../services/turmaService";
-import {FiPlus} from "react-icons/fi";
+import {FiEdit, FiPlus, FiTrash2} from "react-icons/fi";
 import {getCIDByCodigo, getDescricaoCompletaByCodigo} from "../../enums/CidEnum.ts";
 
 const InfoLink = styled.span`
@@ -409,6 +410,22 @@ export const CadastroAluno: React.FC = () => {
         }
     }
 
+    function handleDeleteDiagnostico(diagnostico: DiagnosticoPessoa) {
+        if (window.confirm('Tem certeza que deseja inativar este diagnóstico?')) {
+            try {
+                deletarDiagnostico(diagnostico.idDiagnosticoPessoa);
+                setAvaliacaoAluno(prev =>
+                    prev.filter(item =>
+                        item.idDiagnosticoPessoa !== diagnostico.idDiagnosticoPessoa
+                    )
+                );
+            } catch (err) {
+                console.error('Erro ao inativar diagnóstico:', err);
+                alert('Erro ao inativar diagnóstico.');
+            }
+        }
+    }
+
     return (
         <>
             <DefaultContainer>
@@ -682,6 +699,13 @@ export const CadastroAluno: React.FC = () => {
                                                         backgroundColor: theme.colors.primary,
                                                         color: theme.colors.sidebarText
                                                     }}>Arquivo</th>
+                                                    <th style={{
+                                                        padding: '10px 12px',
+                                                        textAlign: 'left',
+                                                        borderBottom: `2px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.primary,
+                                                        color: theme.colors.sidebarText
+                                                    }}>Ações</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -753,6 +777,40 @@ export const CadastroAluno: React.FC = () => {
                                                                     Não informado
                                                                 </StatValueContent>
                                                             )}
+                                                        </td>
+                                                        <td style={{padding: '8px 12px',
+                                                        borderBottom: `1px solid ${theme.colors.border}`,
+                                                        backgroundColor: theme.colors.surface,
+                                                        display: 'flex',
+                                                        gap: '8px'
+                                                        }}>
+                                                            <ButtonStyled
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setAvaliacaoEdit(diagnostico);
+                                                                    setTimeout(() => {
+                                                                        setIsModalAvaliacaoOpen(true);
+                                                                    }, 100);
+                                                                }}
+                                                                title="Editar"
+                                                                style={{ padding: '4px 16px', fontSize: 14 }}
+                                                            >
+                                                                <FiEdit size={16} />
+                                                            </ButtonStyled>
+                                                            <ButtonStyled
+                                                                type="button"
+                                                                onClick={async () => {
+                                                                    handleDeleteDiagnostico(diagnostico);
+                                                                }}
+                                                                title="Inativar"
+                                                                style={{
+                                                                    padding: '4px 16px',
+                                                                    fontSize: 14,
+                                                                    backgroundColor: theme.colors.danger
+                                                                }}
+                                                            >
+                                                                <FiTrash2 size={16} />
+                                                            </ButtonStyled>
                                                         </td>
                                                     </tr>
                                                 ))}

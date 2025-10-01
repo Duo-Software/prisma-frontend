@@ -65,6 +65,7 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
     useEffect(() => {
         if (initialData) {
             setAvaliacao(initialData);
+            initCidAndCategoria(initialData.cid);
         } else {
             setAvaliacao(initialAvaliacaoState);
         }
@@ -92,6 +93,22 @@ const AvaliacaoAlunoModal: React.FC<AvaliacaoAlunoModalProps> = ({
         setAvaliacao(prev => ({
             ...prev,
             cid: cidSelecionado?.codigoEnum || ""
+        }));
+    }
+
+    function initCidAndCategoria(cidCarregado: any) {
+        const cidSelecionado = Object.values(CID).find(cid => cid.codigoEnum === cidCarregado);
+        setCategoria(cidSelecionado?.categoria || "");
+        setCids(Object.values(CID).filter(cid => cid.categoria === cidSelecionado?.categoria || "").map(cid => ({
+            codigo: cid.codigo,
+            codigoEnum: cid.codigoEnum,
+            descricao: cid.descricao,
+            categoria: cid.categoria
+        })));
+        setAvaliacao(prev => ({
+            ...prev,
+            cid: cidSelecionado?.codigoEnum || "",
+            categoria: cidSelecionado?.categoria || ""
         }));
     }
 
