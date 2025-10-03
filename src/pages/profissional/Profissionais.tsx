@@ -112,8 +112,6 @@ const Profissionais: React.FC = () => {
                             <StatContent>
                                 <StatValue>{profissional.pessoa.nome}</StatValue>
                                 <StatLabel>Cargo: {profissional.cargo}</StatLabel>
-                                <StatLabel>Email: {profissional.pessoa.email}</StatLabel>
-                                <StatLabel>Telefone: {profissional.pessoa.telefone}</StatLabel>
                                 <StatLabel>Instituição: {profissional.instituicaoEnsino?.nome}</StatLabel>
                                 <StatLabel>
                                     Status:

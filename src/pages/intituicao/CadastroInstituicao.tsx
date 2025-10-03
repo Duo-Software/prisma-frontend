@@ -212,6 +212,7 @@ const CadastroInstituicao: React.FC = () => {
                                     onChange={handleChange}
                                     required
                                     disabled={submitted}
+                                    style={{ textTransform: "uppercase" }}
                                 />
                             </StatLabel>
                             <StatLabel>
@@ -293,17 +294,6 @@ const CadastroInstituicao: React.FC = () => {
                                     <option>Militar</option>
                                     <option>Privada</option>
                                 </select>
-                            </StatLabel>
-                            <StatLabel style={{display: "flex", alignItems: "center"}}>
-                                <input
-                                    type="checkbox"
-                                    name="ativo"
-                                    checked={form.ativo}
-                                    onChange={handleChange}
-                                    disabled={submitted}
-                                    style={{marginRight: 8}}
-                                />
-                                Ativa
                             </StatLabel>
                         </StatContent>
                         <div style={{marginTop: 24, textAlign: "right"}}>
