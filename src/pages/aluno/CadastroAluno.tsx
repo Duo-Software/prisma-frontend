@@ -410,7 +410,7 @@ export const CadastroAluno: React.FC = () => {
         }
     }
 
-    function handleDeleteDiagnostico(diagnostico: DiagnosticoPessoa) {
+    function handleDeleteDiagnostico(diagnostico: any) {
         if (window.confirm('Tem certeza que deseja inativar este diagnóstico?')) {
             try {
                 deletarDiagnostico(diagnostico.idDiagnosticoPessoa);
