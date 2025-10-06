@@ -328,7 +328,7 @@ const CadastroProfissional: React.FC = () => {
                             <h3 style={{ marginTop: 0, color: theme.colors.primary }}>Dados Pessoais</h3>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                                 <StatLabel>Nome: <StatValueContent style={{ color: theme.colors.textSecondary }}>{form.pessoa.nome}</StatValueContent></StatLabel>
-                                <StatLabel>CPF: <StatValueContent>{form.pessoa.cpf}</StatValueContent></StatLabel>
+                                <StatLabel>CPF: <StatValueContent>{formatarCpf(form.pessoa.cpf)}</StatValueContent></StatLabel>
                                 <StatLabel>
                                     Data de Nascimento:{" "}
                                     <StatValueContent>

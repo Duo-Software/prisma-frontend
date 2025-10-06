@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Função para buscar aluno pelo CPF da pessoa
-export const buscarAlunoPorCpf = async (cpf: string): Promise<{ encontrado: boolean; aluno?: Aluno }> => {
+export const buscarAlunoPorCpf = async (cpf: string | undefined): Promise<{ encontrado: boolean; aluno?: Aluno }> => {
   try {
     const response = await axios.get(`${API_URL}/alunos/cpf/${cpf}`);
     return {
@@ -12,13 +12,11 @@ export const buscarAlunoPorCpf = async (cpf: string): Promise<{ encontrado: bool
       aluno: response.data
     };
   } catch (error: any) {
-    if (error.response?.status === 404) {
-      return {
-        encontrado: false
-      };
-    }
-    throw error;
+    console.error(`Erro ao buscar aluno com CPF ${cpf}:`, error);
   }
+  return {
+    encontrado: false
+  };
 };
 
 // Função para formatar CPF com máscara

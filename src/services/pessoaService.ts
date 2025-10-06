@@ -53,7 +53,8 @@ export const buscarPessoaPorCpf = async (cpf: string): Promise<PessoaResult> => 
 };
 
 // Formata o CPF no padrão 000.000.000-00
-export const formatarCpf = (cpf: string): string => {
+export const formatarCpf = (cpf: string | undefined): string => {
+  if (!cpf) return "";
   const cpfLimpo = cpf.replace(/[^0-9]/g, '');
   if (cpfLimpo.length !== 11) return cpf;
 
