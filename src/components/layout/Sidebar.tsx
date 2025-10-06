@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
         { path: '/turmas', label: 'Turmas', icon: <FiBookOpen /> },
         { path: '/profissionais', label: 'Profissionais', icon: <FiUsers /> },
         { path: '/alunos', label: 'Alunos', icon: <FiUsers /> },
-        { path: '/formularios', label: 'Formulários', icon: <FiDatabase /> },
+        { path: '/formularios', label: 'Protocolos', icon: <FiDatabase /> },
         { path: '/profile', label: 'Perfil', icon: <FiUser /> },
         { path: '/settings', label: 'Configurações', icon: <FiSettings /> },
     ];

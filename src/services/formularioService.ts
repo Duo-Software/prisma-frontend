@@ -6,7 +6,7 @@ export const buscarFormularios = async (): Promise<Formulario[]> => {
     const response = await axios.get<Formulario[]>(`${API_URL}/formularios`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar formulários:', error);
+    console.error('Erro ao buscar os protocolos:', error);
     throw error;
   }
 }
@@ -20,7 +20,7 @@ export const buscarTodosFormularios = async (): Promise<Formulario[]> => {
     const response = await axios.get<Formulario[]>(`${API_URL}/formularios`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar formulários:', error);
+    console.error('Erro ao buscar os protocolos:', error);
     throw error;
   }
 };

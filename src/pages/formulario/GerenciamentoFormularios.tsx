@@ -84,7 +84,7 @@ const GerenciamentoFormularios: React.FC = () => {
         const response = await buscarTodosFormularios();
         setFormularios(response);
       } catch (error) {
-        console.error('Erro ao carregar formulários:', error);
+        console.error('Erro ao carregar os protocolos:', error);
       } finally {
         setLoading(false);
       }
@@ -155,18 +155,18 @@ const GerenciamentoFormularios: React.FC = () => {
   if (loading) {
     return (
       <PageContainer>
-        <Message>Carregando formulários...</Message>
+        <Message>Carregando protocolos...</Message>
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <Title>Gerenciamento de Formulários de Avaliação</Title>
+      <Title>Gerenciamento de Protocolos de Avaliação</Title>
 
       <SelectsContainer>
         <SelectBox
-          label="Formulário"
+          label="Protocolo de Avaliação"
           options={formularios.map(form => ({
             id: form.id,
             nome: form.nomeFormulario

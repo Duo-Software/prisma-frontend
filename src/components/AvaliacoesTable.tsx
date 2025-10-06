@@ -81,7 +81,7 @@ const AvaliacoesTable: React.FC<TableProps> = ({
       <StyledTable>
         <thead>
           <tr>
-            <Th>Formulário</Th>
+            <Th>Protocolo</Th>
             <Th>Aluno</Th>
             <Th>Data</Th>
             <Th>Ações</Th>
